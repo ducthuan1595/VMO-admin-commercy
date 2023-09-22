@@ -2,12 +2,12 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import MainLayout from "../../layout/MainLayout";
-import AddVoucher from "./AddVoucher";
+import AddCategory from "./AddCategory";
 import { requests } from "../../api";
 import { context } from "../../store";
 import { URL } from "../../api";
 
-interface Voucher {
+interface Category {
   _id: string;
   code: string;
   discount: number;
@@ -23,18 +23,17 @@ interface VoucherPage {
   prevPage: boolean;
   totalVoucher: number;
   activeVoucher: number;
-  totalPage: number;
-  vouchers: Voucher[];
+  vouchers: Category[];
 }
 
-export default function Voucher() {
+export default function Category() {
   const value = useContext(context);
   const [vouchers, setVouchers] = useState<VoucherPage | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(8);
 
-  const getVoucher = async (page: number | undefined): Promise<void> => {
+  const getVoucher = async () => {
     if (value && value.user && value.user.token) {
-      // const curPage: number = page || 1;
-      const limit = 8;
       const res = await requests.getVoucher(page, limit, value.user.token);
       console.log(res);
 
@@ -44,23 +43,8 @@ export default function Voucher() {
     }
   };
   useEffect(() => {
-    getVoucher(1);
+    getVoucher();
   }, []);
-
-  const handleNextPage = () => {
-    if (vouchers && vouchers.currPage && vouchers.nextPage) {
-      console.log(vouchers.currPage);
-
-      const page = +vouchers.currPage + 1;
-      getVoucher(page);
-    }
-  };
-  const handlePrevPage = () => {
-    if (vouchers && vouchers.currPage && vouchers.prevPage) {
-      const page = +vouchers.currPage - 1;
-      getVoucher(page);
-    }
-  };
 
   return (
     <MainLayout>
@@ -71,7 +55,7 @@ export default function Voucher() {
             Active ( {vouchers?.activeVoucher} / {vouchers?.totalVoucher} )
           </span>
         </div>
-        <AddVoucher getVoucher={getVoucher} />
+        <AddCategory getVoucher={getVoucher} />
         <div className="text-[white] mt-12 text-[22px] text-center">
           List Voucher
         </div>
@@ -119,35 +103,6 @@ export default function Voucher() {
               })}
           </tbody>
         </table>
-        {vouchers?.totalPage && vouchers.totalPage > 1 && (
-          <div
-            className="text-[white] flex gap-4 mt-4 mb-8 justify-between items-center"
-            onClick={handlePrevPage}
-          >
-            {vouchers?.prevPage ? (
-              <span className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] justify-self-start">
-                <div className="pl-[20px]">
-                  <i className="fa-solid fa-chevron-left"></i> Prev
-                </div>
-              </span>
-            ) : (
-              <span className="w-[45%]"></span>
-            )}
-            <span>{vouchers.currPage}</span>
-            {vouchers?.nextPage ? (
-              <span
-                className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] text-right justify-items-end"
-                onClick={handleNextPage}
-              >
-                <div className="pr-[20px]">
-                  Next <i className="fa-solid fa-chevron-right"></i>
-                </div>
-              </span>
-            ) : (
-              <span className="w-[45%]"></span>
-            )}
-          </div>
-        )}
       </div>
     </MainLayout>
   );

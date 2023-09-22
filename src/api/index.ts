@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const SERVER_URL = "http://localhost:5050/api";
+export const SERVER_URL = "http://localhost:5050";
+export const URL = SERVER_URL + "/api";
 
 interface Value {
   email?: string;
@@ -10,7 +11,7 @@ interface Value {
 export const requests = {
   login: (value: Value) => {
     return axios.post(
-      `${SERVER_URL}/login-admin`,
+      `${URL}/login-admin`,
       { ...value },
       {
         validateStatus: function (status) {
@@ -21,7 +22,7 @@ export const requests = {
   },
   forgotPassword: (value: Value) => {
     return axios.post(
-      `${SERVER_URL}/forgot-password`,
+      `${URL}/forgot-password`,
       { ...value },
       {
         validateStatus: function (status) {
@@ -30,15 +31,28 @@ export const requests = {
       }
     );
   },
-  getVoucher: (token: string) => {
-    console.log(token);
-
-    return axios.get(`${SERVER_URL}/get-voucher`, {
+  getVoucher: (
+    page: number | undefined,
+    limit: number | undefined,
+    token: string
+  ) => {
+    return axios.get(`${URL}/get-voucher?page=${page}&limit=${limit}`, {
       validateStatus: function (status: any) {
         return status < 500;
       },
       headers: {
         Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  addVoucher: (value: object, token: string) => {
+    return axios.post(`${URL}/create-voucher`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       },
     });
   },

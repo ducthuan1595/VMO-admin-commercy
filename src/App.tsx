@@ -1,11 +1,13 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Form from "./page/Form";
 import Home from "./page/Home";
 import ForgotPassword from "./page/ForgotPassword";
-import AddVoucher from "./page/voucher/AddVoucher";
 import Voucher from "./page/voucher/Voucher";
+import CheckOutlet from "./util/checkOutlet";
 
 import "./App.css";
 
@@ -13,11 +15,14 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Form />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/voucher" element={<Voucher />} />
+        <Route element={<CheckOutlet></CheckOutlet>}>
+          <Route path="/" element={<Home />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/voucher" element={<Voucher />} />
+        </Route>
       </Routes>
+      <ToastContainer />
     </div>
   );
 }

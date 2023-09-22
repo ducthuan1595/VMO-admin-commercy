@@ -22,9 +22,9 @@ const ProviderContext = ({ children }: { children: React.ReactNode }) => {
   );
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("admin-book", JSON.stringify(user));
-    }
+    // if (user) {
+    localStorage.setItem("admin-book", JSON.stringify(user));
+    // }
   }, [user]);
 
   const value: UserSectionContextType = {

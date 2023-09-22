@@ -9,11 +9,7 @@ import { requests } from "../../api";
 import { context } from "../../store";
 import handleToast from "../../util/toast";
 
-const AddVoucher = ({
-  getVoucher,
-}: {
-  getVoucher: (num: number) => Promise<void>;
-}) => {
+const AddCategory = ({ getVoucher }: { getVoucher: () => Promise<void> }) => {
   const storeValue = useContext(context);
 
   const [code, setCode] = useState("");
@@ -43,7 +39,7 @@ const AddVoucher = ({
 
       const res = await requests.addVoucher(formData, storeValue.user.token);
       if (res.data.message === "ok") {
-        getVoucher(1);
+        getVoucher();
         handleToast(toast.success, "Add voucher successfully!");
         setCode("");
         setDiscount("");
@@ -137,4 +133,4 @@ const AddVoucher = ({
   );
 };
 
-export default AddVoucher;
+export default AddCategory;
