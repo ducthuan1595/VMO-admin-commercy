@@ -7,6 +7,7 @@ import Form from "./page/Form";
 import Home from "./page/Home";
 import ForgotPassword from "./page/ForgotPassword";
 import Voucher from "./page/voucher/Voucher";
+import Category from "./page/category/Category";
 import CheckOutlet from "./util/checkOutlet";
 
 import "./App.css";
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/voucher" element={<Voucher />} />
+          <Route path="/category" element={<Category />} />
         </Route>
       </Routes>
       <ToastContainer />

@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 import MainLayout from "../../layout/MainLayout";
 import AddVoucher from "./AddVoucher";
 import { requests } from "../../api";
 import { context } from "../../store";
+import handleToast from "../../util/toast";
 import { URL } from "../../api";
 
 interface Voucher {
@@ -31,7 +33,7 @@ export default function Voucher() {
   const value = useContext(context);
   const [vouchers, setVouchers] = useState<VoucherPage | null>(null);
 
-  const getVoucher = async (page: number | undefined): Promise<void> => {
+  const getVoucher = async (page: number | null): Promise<void> => {
     if (value && value.user && value.user.token) {
       // const curPage: number = page || 1;
       const limit = 8;
@@ -47,10 +49,23 @@ export default function Voucher() {
     getVoucher(1);
   }, []);
 
+  const handleDelete = async (id: string) => {
+    if (value && value.user && value.user.token) {
+      const object = {
+        voucherId: id,
+      };
+      const res = await requests.deleteVoucher(object, value.user.token);
+      if (res.data.message === "ok") {
+        handleToast(toast.success, "You removed successfully");
+        getVoucher(null);
+      } else {
+        handleToast(toast.error, res.data.message);
+      }
+    }
+  };
+
   const handleNextPage = () => {
     if (vouchers && vouchers.currPage && vouchers.nextPage) {
-      console.log(vouchers.currPage);
-
       const page = +vouchers.currPage + 1;
       getVoucher(page);
     }
@@ -112,7 +127,10 @@ export default function Voucher() {
                       )}
                     </td>
                     <td className="text-center cursor-pointer">
-                      <i className="fa-solid fa-trash text-[#f00] text-[19px]"></i>
+                      <i
+                        onClick={handleDelete.bind(null, v._id)}
+                        className="fa-solid fa-trash text-[#f00] text-[19px]"
+                      ></i>
                     </td>
                   </tr>
                 );

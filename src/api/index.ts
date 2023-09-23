@@ -31,11 +31,7 @@ export const requests = {
       }
     );
   },
-  getVoucher: (
-    page: number | undefined,
-    limit: number | undefined,
-    token: string
-  ) => {
+  getVoucher: (page: number | null, limit: number | null, token: string) => {
     return axios.get(`${URL}/get-voucher?page=${page}&limit=${limit}`, {
       validateStatus: function (status: any) {
         return status < 500;
@@ -53,6 +49,65 @@ export const requests = {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+  deleteVoucher: (value: object, token: string) => {
+    return axios.post(`${URL}/delete-voucher`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  getCategory: (
+    page: number | null,
+    limit: number | null,
+    categoryId: string | null,
+    token: string
+  ) => {
+    return axios.get(
+      `${URL}/get-all-category?page=${page}&limit=${limit}&categoryId=${categoryId}`,
+      {
+        validateStatus: function (status: any) {
+          return status < 500;
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+  addCategory: (value: object, token: string) => {
+    return axios.post(`${URL}/create-category`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+  deleteCategory: (value: object, token: string) => {
+    return axios.post(`${URL}/delete-category`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  editCategory: (value: object, token: string) => {
+    return axios.post(`${URL}/update-category`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
   },
