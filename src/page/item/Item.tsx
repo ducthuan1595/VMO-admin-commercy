@@ -3,55 +3,77 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 import MainLayout from "../../layout/MainLayout";
-import AddCategory from "./AddCategory";
+import AddItem from "./AddItem";
 import { requests } from "../../api";
 import { context } from "../../store";
 import { URL } from "../../api";
 import handleToast from "../../util/toast";
+import { CategoryType } from "../category/Category";
 
-export interface CategoryType {
+export interface ItemType {
   _id: string;
   name: string;
-  banner: string[];
+  author: string;
+  pic: string[];
   description: string;
-  active: boolean;
-  position: number;
+  pricePay: number;
+  priceInput: number;
+  slogan: string;
+  barcode: string;
+  count: number;
+  weight: number;
+  flashSaleId: FlashSaleType;
+  categoryId: CategoryType;
+  detailPic: string[];
 }
 
-interface CategoryPage {
+interface ItemStateType {
   currPage: number;
   nextPage: boolean;
   prevPage: boolean;
-  totalCategory: number;
+  totalItem: number;
   totalPage: number;
-  categories: CategoryType[];
+  products: ItemType[];
 }
 
-export default function Category() {
+interface FlashSaleType {
+  name: string;
+  description: string;
+  start_date: number;
+  end_date: number;
+  discount_percent: number;
+  items: ItemType[];
+  isActive: boolean;
+}
+
+export default function Item() {
   const value = useContext(context);
 
-  const [categories, setCategories] = useState<CategoryPage | null>(null);
-  const [detailCategory, setDetailCategory] = useState<CategoryType | null>(
-    null
-  );
+  const [item, setItem] = useState<ItemStateType | null>(null);
+  const [detailItem, setDetailItem] = useState<ItemType | null>(null);
 
-  const getCategory = async (page: number | null) => {
+  const getItem = async (page: number | null) => {
     if (value && value.user && value.user.token) {
       const limit: number = 8;
-      const res = await requests.getCategory(
+      const res = await requests.getItem(
+        null,
+        null,
+        null,
         page,
         limit,
         null,
         value.user.token
       );
 
+      console.log(res.data);
+
       if (res.data.message === "ok") {
-        setCategories(res.data.data);
+        setItem(res.data.data);
       }
     }
   };
   useEffect(() => {
-    getCategory(1);
+    getItem(1);
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -62,7 +84,7 @@ export default function Category() {
       const res = await requests.deleteCategory(object, value.user.token);
       if (res.data.message === "ok") {
         handleToast(toast.success, "You removed successfully");
-        getCategory(null);
+        getItem(null);
       } else {
         handleToast(toast.error, res.data.message);
       }
@@ -71,24 +93,34 @@ export default function Category() {
 
   const handleEdit = async (id: string) => {
     if (value && value.user && value.user.token) {
-      const res = await requests.getCategory(null, null, id, value.user.token);
+      const res = await requests.getItem(
+        null,
+        null,
+        null,
+        null,
+        null,
+        id,
+        value.user.token
+      );
       if (res.data.message === "ok") {
-        setDetailCategory(res.data.data);
+        setDetailItem(res.data.data);
         window.scrollTo(0, 0);
       }
     }
   };
 
   const handleNextPage = () => {
-    if (categories && categories.currPage && categories.nextPage) {
-      const page = +categories.currPage + 1;
-      getCategory(page);
+    if (item && item.currPage && item.nextPage) {
+      console.log(item.currPage);
+
+      const page = +item.currPage + 1;
+      getItem(page);
     }
   };
   const handlePrevPage = () => {
-    if (categories && categories.currPage && categories.prevPage) {
-      const page = +categories.currPage - 1;
-      getCategory(page);
+    if (item && item.currPage && item.prevPage) {
+      const page = +item.currPage - 1;
+      getItem(page);
     }
   };
 
@@ -96,56 +128,58 @@ export default function Category() {
     <MainLayout>
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-[white] text-[32px] pb-4">Manager Category</h1>
+          <h1 className="text-[white] text-[32px] pb-4">Manager Product</h1>
           <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]"></span>
         </div>
-        <AddCategory
-          getCategory={getCategory}
-          detailCategory={detailCategory}
-        />
+        <AddItem getItem={getItem} detailItem={detailItem} />
         <div className="text-[white] mt-12 text-[22px] text-center">
-          List Category
+          List Product
         </div>
         <table className="text-[#333] mt-4">
           <thead>
             <tr>
-              <th>Name Category</th>
-              <th>Banner</th>
-              <th>Description</th>
-              <th>Role</th>
-              <th>Active</th>
+              <th>Book Name</th>
+              <th>Author</th>
+              <th>Image</th>
+              <th>Price Origin</th>
+              <th>Price Pay</th>
+              <th>Barcode</th>
+              <th>Category</th>
+              <th>Count</th>
+              <th>Weight</th>
+              <th>Flash Sale</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {categories &&
-              categories.categories &&
-              categories.categories.map((c) => {
+            {item &&
+              item.products &&
+              item.products.map((c) => {
                 return (
                   <tr key={c._id}>
                     <td className="capitalize">{c.name}</td>
+                    <td className="capitalize">{c.author}</td>
                     <td className="flex flex-wrap gap-1">
-                      {c.banner.map((i) => {
+                      {c.pic.map((i) => {
                         return (
                           <span className="" key={i}>
                             <img
                               className="h-12"
                               src={`${URL}/image/${i}`}
-                              alt="category"
+                              alt="book"
                             />
                           </span>
                         );
                       })}
                     </td>
-                    <td>{c.description}</td>
-                    <td>{c.position}</td>
-                    <td className="text-center">
-                      {c.active ? (
-                        <i className="fa-solid fa-circle-check text-[green]"></i>
-                      ) : (
-                        <i className="fa-solid fa-circle-xmark text-[#ff1e00d0]"></i>
-                      )}
-                    </td>
+                    <td>{c.priceInput}</td>
+                    <td>{c.pricePay}</td>
+                    <td>{c.barcode}</td>
+                    <td>{c.categoryId.name}</td>
+                    <td>{c.count}</td>
+                    <td>{c.weight}</td>
+                    <td>{c.flashSaleId ? c.flashSaleId.name : "no"}</td>
+
                     <td className="text-center cursor-pointer">
                       <button className="mr-8">
                         <i
@@ -165,12 +199,12 @@ export default function Category() {
               })}
           </tbody>
         </table>
-        {categories?.totalPage && categories.totalPage > 1 && (
+        {item?.totalPage && item.totalPage > 1 && (
           <div
             className="text-[white] flex gap-4 mt-4 mb-8 justify-between items-center"
             onClick={handlePrevPage}
           >
-            {categories?.prevPage ? (
+            {item?.prevPage ? (
               <span className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] justify-self-start">
                 <div className="pl-[20px]">
                   <i className="fa-solid fa-chevron-left"></i> Prev
@@ -179,8 +213,8 @@ export default function Category() {
             ) : (
               <span className="w-[45%]"></span>
             )}
-            <span>{categories.currPage}</span>
-            {categories?.nextPage ? (
+            <span>{item.currPage}</span>
+            {item?.nextPage ? (
               <span
                 className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] text-right justify-items-end"
                 onClick={handleNextPage}

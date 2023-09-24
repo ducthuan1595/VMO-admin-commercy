@@ -111,4 +111,46 @@ export const requests = {
       },
     });
   },
+  // Item
+  getItem: (
+    filter: string | null,
+    key: string | null,
+    sort: string | null,
+    page: number | null,
+    limit: number | null,
+    itemId: string | null,
+    token: string
+  ) => {
+    return axios.get(
+      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${key}&sort=${sort}`,
+      {
+        validateStatus: function (status: any) {
+          return status < 500;
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+  editItem: (value: object, token: string) => {
+    return axios.post(`${URL}/update-item`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  createItem: (value: object, token: string) => {
+    return axios.post(`${URL}/create-item`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };
