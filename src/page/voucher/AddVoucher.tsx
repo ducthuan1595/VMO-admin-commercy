@@ -30,7 +30,7 @@ const AddVoucher = ({
     }
   };
 
-  const handleAdd = async (e: any) => {
+  const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     const dateTime = expirateDate.getTime();
     if (storeValue && storeValue.user && dateTime && image) {

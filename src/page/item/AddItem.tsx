@@ -26,7 +26,7 @@ const AddItem = ({
   const [slogan, setSlogan] = useState("");
   const [barcode, setBarcode] = useState("");
   const [categories, setCategories] = useState<CategoryType[] | null>(null);
-  const [selectCategory, setSelectCategory] = useState("");
+  const [selectCategory, setSelectCategory] = useState<string>("");
   const [count, setCount] = useState<number | string>("");
   const [weight, setWeight] = useState<number | string>("");
   const [pic, setPic] = useState<FileList | null>(null);
@@ -43,6 +43,7 @@ const AddItem = ({
       setDescription(detailItem.description);
       setCount(detailItem.count);
       setWeight(detailItem.weight);
+      setSelectCategory(detailItem?.categoryId.toString());
     }
   }, [detailItem]);
 
@@ -101,10 +102,11 @@ const AddItem = ({
           }
         }
         formData.append("name", name);
-        formData.append("categoryId", detailItem._id);
+        formData.append("itemId", detailItem._id);
         formData.append("author", author);
         formData.append("priceInput", priceInput.toString());
         formData.append("pricePay", pricePay.toString());
+        formData.append("categoryId", selectCategory);
         formData.append("slogan", slogan);
         formData.append("description", description);
         formData.append("barcode", barcode);
@@ -113,7 +115,7 @@ const AddItem = ({
 
         const res = await requests.editItem(formData, storeValue.user.token);
         if (res.data.message === "ok") {
-          getItem(null);
+          getItem(1);
           handleToast(toast.success, "Update Product successfully!");
           setName("");
           setAuthor("");
@@ -151,13 +153,14 @@ const AddItem = ({
         formData.append("pricePay", pricePay.toString());
         formData.append("slogan", slogan);
         formData.append("description", description);
+        formData.append("categoryId", selectCategory);
         formData.append("barcode", barcode);
         formData.append("count", count.toString());
         formData.append("weight", weight.toString());
 
         const res = await requests.createItem(formData, storeValue.user.token);
         if (res.data.message === "ok") {
-          getItem(null);
+          getItem(1);
           handleToast(toast.success, "Add Product successfully!");
           setName("");
           setAuthor("");
@@ -233,6 +236,17 @@ const AddItem = ({
                 value={pricePay}
               />
             </div>
+            <div className="flex flex-1 flex-col gap-2 mb-4">
+              <label htmlFor="">Barcode</label>
+              <input
+                className="p-2 rounded-md text-[#333]"
+                type="text"
+                name="barcode"
+                placeholder="12tf4x67"
+                onChange={(e) => setBarcode(e.target.value)}
+                value={barcode}
+              />
+            </div>
           </div>
           <div className="flex justify-between items-center gap-8">
             <div className="flex flex-1 flex-col gap-2 mb-4">
@@ -263,7 +277,7 @@ const AddItem = ({
               />
             </div>
             <div className="flex flex-col gap-2 mb-4">
-              <label htmlFor="">Weight</label>
+              <label htmlFor="">Page Number</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="number"
@@ -291,7 +305,7 @@ const AddItem = ({
             <textarea
               className="p-2 rounded-md text-[#333]"
               // type="text"
-              rows={3}
+              rows={5}
               name="description"
               placeholder="Enter Description"
               onChange={(e) => setDescription(e.target.value)}

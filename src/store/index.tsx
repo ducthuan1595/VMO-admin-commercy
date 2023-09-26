@@ -12,14 +12,22 @@ interface UserSectionContextType {
   setUser?: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
+interface TotalProductType {
+  totalProduct: number | null;
+  setTotalProduct?: React.Dispatch<React.SetStateAction<number | null>>;
+}
+
 const currUser = localStorage.getItem("admin-book");
 
-export const context = createContext<UserSectionContextType | null>(null);
+export const context = createContext<
+  UserSectionContextType | TotalProductType | null
+>(null);
 
 const ProviderContext = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(
     currUser && JSON.parse(currUser)
   );
+  const [totalProduct, setTotalProduct] = useState<number | null>();
 
   useEffect(() => {
     // if (user) {
@@ -30,6 +38,8 @@ const ProviderContext = ({ children }: { children: React.ReactNode }) => {
   const value: UserSectionContextType = {
     user,
     setUser,
+    setTotalProduct,
+    totalProduct,
   };
 
   return <context.Provider value={value}>{children}</context.Provider>;

@@ -9,6 +9,7 @@ import ForgotPassword from "./page/ForgotPassword";
 import Voucher from "./page/voucher/Voucher";
 import Category from "./page/category/Category";
 import Item from "./page/item/Item";
+import FlashSale from "./page/flashSale/FlashSale";
 
 import CheckOutlet from "./util/checkOutlet";
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/voucher" element={<Voucher />} />
           <Route path="/category" element={<Category />} />
           <Route path="/item" element={<Item />} />
+          <Route path="/flash-sale" element={<FlashSale />} />
         </Route>
       </Routes>
       <ToastContainer />

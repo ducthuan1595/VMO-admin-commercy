@@ -114,15 +114,17 @@ export const requests = {
   // Item
   getItem: (
     filter: string | null,
-    key: string | null,
+    searchItem: string | null,
     sort: string | null,
     page: number | null,
     limit: number | null,
     itemId: string | null,
     token: string
   ) => {
+    console.log("key", searchItem);
+
     return axios.get(
-      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${key}&sort=${sort}`,
+      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${searchItem}&sort=${sort}`,
       {
         validateStatus: function (status: any) {
           return status < 500;
@@ -145,6 +147,37 @@ export const requests = {
   },
   createItem: (value: object, token: string) => {
     return axios.post(`${URL}/create-item`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  deleteItem: (value: object, token: string) => {
+    return axios.post(`${URL}/delete-item`, value, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  // flash sale
+  getFlashSale: (page: number | null, limit: number | null, token: string) => {
+    return axios.get(`${URL}/get-flashsale?page=${page}&limit=${limit}`, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  createFlashSale: (value: object, token: string) => {
+    return axios.post(`${URL}/create-flashsale`, value, {
       validateStatus: function (status: any) {
         return status < 500;
       },

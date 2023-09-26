@@ -166,12 +166,12 @@ export default function Category() {
           </tbody>
         </table>
         {categories?.totalPage && categories.totalPage > 1 && (
-          <div
-            className="text-[white] flex gap-4 mt-4 mb-8 justify-between items-center"
-            onClick={handlePrevPage}
-          >
+          <div className="text-[white] flex gap-4 mt-4 mb-8 justify-between items-center">
             {categories?.prevPage ? (
-              <span className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] justify-self-start">
+              <span
+                className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] justify-self-start"
+                onClick={handlePrevPage}
+              >
                 <div className="pl-[20px]">
                   <i className="fa-solid fa-chevron-left"></i> Prev
                 </div>

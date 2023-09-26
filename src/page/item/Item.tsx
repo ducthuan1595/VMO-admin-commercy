@@ -9,6 +9,7 @@ import { context } from "../../store";
 import { URL } from "../../api";
 import handleToast from "../../util/toast";
 import { CategoryType } from "../category/Category";
+import { FlashSaleType } from "../flashSale/FlashSale";
 
 export interface ItemType {
   _id: string;
@@ -34,16 +35,6 @@ interface ItemStateType {
   totalItem: number;
   totalPage: number;
   products: ItemType[];
-}
-
-interface FlashSaleType {
-  name: string;
-  description: string;
-  start_date: number;
-  end_date: number;
-  discount_percent: number;
-  items: ItemType[];
-  isActive: boolean;
 }
 
 export default function Item() {
@@ -79,12 +70,12 @@ export default function Item() {
   const handleDelete = async (id: string) => {
     if (value && value.user && value.user.token) {
       const object = {
-        categoryId: id,
+        itemId: id,
       };
-      const res = await requests.deleteCategory(object, value.user.token);
+      const res = await requests.deleteItem(object, value.user.token);
       if (res.data.message === "ok") {
         handleToast(toast.success, "You removed successfully");
-        getItem(null);
+        getItem(1);
       } else {
         handleToast(toast.error, res.data.message);
       }
@@ -102,6 +93,8 @@ export default function Item() {
         id,
         value.user.token
       );
+      console.log("detail item", res);
+
       if (res.data.message === "ok") {
         setDetailItem(res.data.data);
         window.scrollTo(0, 0);
@@ -146,7 +139,7 @@ export default function Item() {
               <th>Barcode</th>
               <th>Category</th>
               <th>Count</th>
-              <th>Weight</th>
+              <th>Page Number</th>
               <th>Flash Sale</th>
               <th>Action</th>
             </tr>
@@ -172,16 +165,26 @@ export default function Item() {
                         );
                       })}
                     </td>
-                    <td>{c.priceInput}</td>
-                    <td>{c.pricePay}</td>
+                    <td>
+                      {c.priceInput
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
+                      đ
+                    </td>
+                    <td>
+                      {c.pricePay
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
+                      đ
+                    </td>
                     <td>{c.barcode}</td>
                     <td>{c.categoryId.name}</td>
-                    <td>{c.count}</td>
-                    <td>{c.weight}</td>
+                    <td>{c.count} books</td>
+                    <td>{c.weight} pages</td>
                     <td>{c.flashSaleId ? c.flashSaleId.name : "no"}</td>
 
-                    <td className="text-center cursor-pointer">
-                      <button className="mr-8">
+                    <td className="text-center cursor-pointer w-[5rem]">
+                      <button className="mr-5">
                         <i
                           onClick={() => handleEdit(c._id)}
                           className="fa-solid fa-pencil text-[green] text-[19px]"
@@ -200,12 +203,12 @@ export default function Item() {
           </tbody>
         </table>
         {item?.totalPage && item.totalPage > 1 && (
-          <div
-            className="text-[white] flex gap-4 mt-4 mb-8 justify-between items-center"
-            onClick={handlePrevPage}
-          >
+          <div className="text-[white] flex gap-4 mt-4 mb-8 justify-between items-center">
             {item?.prevPage ? (
-              <span className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] justify-self-start">
+              <span
+                className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] justify-self-start"
+                onClick={handlePrevPage}
+              >
                 <div className="pl-[20px]">
                   <i className="fa-solid fa-chevron-left"></i> Prev
                 </div>
