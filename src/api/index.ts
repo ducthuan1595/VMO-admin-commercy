@@ -186,4 +186,14 @@ export const requests = {
       },
     });
   },
+  getOrder: (page: number, limit: number, token: string) => {
+    return axios.get(`${URL}/get-order?page=${page}&limit=${limit}`, {
+      validateStatus: function (status: any) {
+        return status < 500;
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };

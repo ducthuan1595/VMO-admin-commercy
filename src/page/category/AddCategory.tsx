@@ -66,7 +66,7 @@ const AddCategory = ({
           storeValue.user.token
         );
         if (res.data.message === "ok") {
-          getCategory(null);
+          getCategory(1);
           handleToast(toast.success, "Update category successfully!");
           setName("");
           setBanner(null);

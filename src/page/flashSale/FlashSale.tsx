@@ -83,6 +83,7 @@ export default function FlashSale() {
         <table className="text-[#333] mt-4">
           <thead>
             <tr>
+              <th>STT</th>
               <th>Name</th>
               <th>Discount Percent</th>
               <th>Start Date</th>
@@ -94,7 +95,7 @@ export default function FlashSale() {
           <tbody>
             {flashSales &&
               flashSales.flashSales &&
-              flashSales.flashSales.map((v) => {
+              flashSales.flashSales.map((v, i) => {
                 const handleShowDate = (time: number) => {
                   const date = new Date(time);
 
@@ -105,6 +106,7 @@ export default function FlashSale() {
 
                 return (
                   <tr key={v._id}>
+                    <td>{i + 1}</td>
                     <td>{v.name}</td>
                     <td>{v.discount_percent}%</td>
                     <td>{handleShowDate(v.start_date)}</td>
@@ -116,15 +118,13 @@ export default function FlashSale() {
                         <i className="fa-solid fa-circle-xmark text-[#ff1e00d0]"></i>
                       )}
                     </td>
-                    {/* <td>{v.items.map(i => {
-
-                    })}</td> */}
-                    {/* <td className="text-center cursor-pointer">
-                      <i
-                        // onClick={handleDelete.bind(null, v._id)}
-                        className="fa-solid fa-trash text-[#f00] text-[19px]"
-                      ></i>
-                    </td> */}
+                    <td>
+                      {v.items.map((i) => (
+                        <ul key={i.itemId._id}>
+                          <li>{i.itemId.name}</li>
+                        </ul>
+                      ))}
+                    </td>
                   </tr>
                 );
               })}

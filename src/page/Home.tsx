@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MainLayout from "../layout/MainLayout";
+import { context } from "../store";
+import { requests } from "../api";
 
 export interface ItemType {
   _id: string;
@@ -26,10 +28,28 @@ interface ItemStateType {
 }
 
 export default function Home() {
+  const value = useContext(context);
   const [orders, setOrder] = useState<ItemStateType | null>(null);
+
+  const fetchOrder = async (page: number) => {
+    if (value && value.user) {
+      const limit = 10;
+      const res = await requests.getOrder(page, limit, value.user.token);
+      if (res.data.message === "ok") {
+        setOrder(res.data.data);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchOrder(1);
+  }, [value]);
+
+  console.log({ orders });
 
   const handleNextPage = () => {};
   const handlePrevPage = () => {};
+
   return (
     <MainLayout>
       <div className="text-[white]">
@@ -50,7 +70,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col bg-[#232323] p-4 min-w-[200px] flex-1 rounded-md">
             <div className="flex justify-between items-center">
-              <span className="text-[22px]">100</span>
+              <span className="text-[22px]">{value?.totalProduct}</span>
               <i className="fa-solid fa-book fa-beat"></i>
             </div>
             <p className="text-[#7b7e7e]">Products</p>

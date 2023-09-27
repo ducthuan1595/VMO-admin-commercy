@@ -34,6 +34,7 @@ interface ItemStateType {
   prevPage: boolean;
   totalItem: number;
   totalPage: number;
+  totalNumber: number;
   products: ItemType[];
 }
 
@@ -60,6 +61,7 @@ export default function Item() {
 
       if (res.data.message === "ok") {
         setItem(res.data.data);
+        value.setTotalProduct(res.data.data.totalNumber);
       }
     }
   };

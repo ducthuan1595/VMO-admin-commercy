@@ -93,21 +93,22 @@ export default function Voucher() {
         <table className="text-[#333] mt-4">
           <thead>
             <tr>
+              <th>STT</th>
               <th>Code</th>
               <th>Image</th>
               <th>Discount</th>
               <th>Expiration Date</th>
               <th>Quantity</th>
               <th>Active</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {vouchers &&
               vouchers.vouchers &&
-              vouchers.vouchers.map((v) => {
+              vouchers.vouchers.map((v, i) => {
                 return (
                   <tr key={v._id}>
+                    <td className="text-center">{i + 1}</td>
                     <td>{v.code}</td>
                     <td>
                       <img
@@ -125,12 +126,6 @@ export default function Voucher() {
                       ) : (
                         <i className="fa-solid fa-circle-xmark text-[#ff1e00d0]"></i>
                       )}
-                    </td>
-                    <td className="text-center cursor-pointer">
-                      <i
-                        onClick={handleDelete.bind(null, v._id)}
-                        className="fa-solid fa-trash text-[#f00] text-[19px]"
-                      ></i>
                     </td>
                   </tr>
                 );
