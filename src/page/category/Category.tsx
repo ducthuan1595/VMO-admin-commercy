@@ -102,6 +102,7 @@ export default function Category() {
         <AddCategory
           getCategory={getCategory}
           detailCategory={detailCategory}
+          setDetailCategory={setDetailCategory}
         />
         <div className="text-[white] mt-12 text-[22px] text-center">
           List Category

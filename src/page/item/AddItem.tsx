@@ -12,9 +12,15 @@ import { CategoryType } from "../category/Category";
 const AddItem = ({
   getItem,
   detailItem,
+  setDetailItem,
 }: {
-  getItem: (num: number | null) => Promise<void>;
+  getItem: (
+    num: number | null,
+    type: string | null,
+    column: string | null
+  ) => Promise<void>;
   detailItem: ItemType | null;
+  setDetailItem: React.Dispatch<React.SetStateAction<ItemType | null>>;
 }) => {
   const storeValue = useContext(context);
 
@@ -115,8 +121,9 @@ const AddItem = ({
 
         const res = await requests.editItem(formData, storeValue.user.token);
         if (res.data.message === "ok") {
-          getItem(1);
+          getItem(1, null, null);
           handleToast(toast.success, "Update Product successfully!");
+          setDetailItem(null);
           setName("");
           setAuthor("");
           setDescription("");
@@ -160,7 +167,7 @@ const AddItem = ({
 
         const res = await requests.createItem(formData, storeValue.user.token);
         if (res.data.message === "ok") {
-          getItem(1);
+          getItem(1, null, null);
           handleToast(toast.success, "Add Product successfully!");
           setName("");
           setAuthor("");
@@ -181,6 +188,8 @@ const AddItem = ({
       }
     }
   };
+
+  console.log({ detailItem });
 
   return (
     <div className="text-[white]">
@@ -282,8 +291,7 @@ const AddItem = ({
                 className="p-2 rounded-md text-[#333]"
                 type="number"
                 name="weight"
-                step={0.1}
-                placeholder="1.5"
+                placeholder="300"
                 onChange={(e) => setWeight(e.target.value)}
                 value={weight}
               />

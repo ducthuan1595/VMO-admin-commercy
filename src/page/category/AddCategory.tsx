@@ -11,9 +11,11 @@ import { CategoryType } from "./Category";
 const AddCategory = ({
   getCategory,
   detailCategory,
+  setDetailCategory,
 }: {
   getCategory: (num: number | null) => Promise<void>;
   detailCategory: CategoryType | null;
+  setDetailCategory: React.Dispatch<React.SetStateAction<CategoryType | null>>;
 }) => {
   const storeValue = useContext(context);
 
@@ -72,6 +74,7 @@ const AddCategory = ({
           setBanner(null);
           setDescription("");
           setPosition("");
+          setDetailCategory(null);
         } else {
           handleToast(toast.error, res.data.message);
         }

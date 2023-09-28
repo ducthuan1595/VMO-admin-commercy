@@ -2,39 +2,113 @@ import React, { useContext, useEffect, useState } from "react";
 import MainLayout from "../layout/MainLayout";
 import { context } from "../store";
 import { requests } from "../api";
+import { ItemType } from "./item/Item";
+import ShowSort from "../util/ShowSort";
+import { SortType } from "../util/ShowSort";
 
-export interface ItemType {
+interface UserType {
+  username: string;
+  email: string;
+}
+interface ItemsOrderType {
+  itemId: ItemType;
+  quantity: number;
   _id: string;
-  name: string;
-  author: string;
-  pic: string[];
-  description: string;
-  pricePay: number;
-  priceInput: number;
-  slogan: string;
-  barcode: string;
-  count: number;
-  weight: number;
-  detailPic: string[];
+}
+
+export interface OrderType {
+  _id: string;
+  amount: number;
+  quantity: number;
+  status: Status;
+  items: ItemsOrderType[];
+  userId: UserType;
 }
 
 interface ItemStateType {
   currPage: number;
   nextPage: boolean;
   prevPage: boolean;
-  totalItem: number;
+  totalOrder: number;
   totalPage: number;
-  products: ItemType[];
+  orders: OrderType[];
 }
+
+type Status = "D0" | "D1" | "D2";
 
 export default function Home() {
   const value = useContext(context);
   const [orders, setOrder] = useState<ItemStateType | null>(null);
+  const [key, setKey] = useState<string>("");
+  const [amountOrder, setAmountOrder] = useState<number | undefined>(0);
+  const [users, setUsers] = useState<UserType[] | null>(null);
+  const [sort, setSort] = useState<SortType>({
+    type: "default",
+    column: "",
+  });
 
-  const fetchOrder = async (page: number) => {
+  const [totalProduct, setTotalProduct] = useState<number>(0);
+
+  const getItem = async (
+    page: number | null,
+    type: string | null,
+    column: string | null
+  ) => {
+    if (value && value.user && value.user.token) {
+      const limit: number = 8;
+      const res = await requests.getItem(
+        null,
+        null,
+        null,
+        page,
+        limit,
+        type,
+        column,
+        null,
+        value.user.token
+      );
+
+      console.log(res.data.data);
+
+      if (res.data.message === "ok") {
+        setTotalProduct(res.data.data.totalNumber);
+      }
+    }
+  };
+  useEffect(() => {
+    getItem(1, null, null);
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (value && value.user) {
+        const limit = 10;
+        const page = 1;
+        const k = key ? key : null;
+        const res = await requests.getUser(page, limit, k, value.user.token);
+
+        if (res.data.message === "ok") {
+          setUsers(res.data.data);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const fetchOrder = async (
+    page: number,
+    type: string | null,
+    column: string | null
+  ) => {
     if (value && value.user) {
       const limit = 10;
-      const res = await requests.getOrder(page, limit, value.user.token);
+      const res = await requests.getOrder(
+        page,
+        limit,
+        type,
+        column,
+        value.user.token
+      );
       if (res.data.message === "ok") {
         setOrder(res.data.data);
       }
@@ -42,108 +116,152 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchOrder(1);
+    fetchOrder(1, null, null);
   }, [value]);
 
   console.log({ orders });
+  useEffect(() => {
+    const num = orders?.orders.reduce((a, b) => {
+      return a + b.amount;
+    }, 0);
+    setAmountOrder(num);
+  }, [orders]);
 
-  const handleNextPage = () => {};
-  const handlePrevPage = () => {};
+  useEffect(() => {
+    if (sort && sort.type && sort.column) {
+      fetchOrder(1, sort.type, sort.column);
+    }
+  }, [sort]);
+
+  const handleSort = (column: string) => {
+    setSort({
+      ...sort,
+      column: column,
+      type: sort.type === "desc" ? "asc" : "desc",
+    });
+  };
+
+  const handleNextPage = () => {
+    if (orders && orders.currPage && orders.nextPage) {
+      const page = +orders.currPage + 1;
+      fetchOrder(page, null, null);
+    }
+  };
+  const handlePrevPage = () => {
+    if (orders && orders.currPage && orders.prevPage) {
+      const page = +orders.currPage - 1;
+      fetchOrder(page, null, null);
+    }
+  };
 
   return (
     <MainLayout>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-[white] text-[32px] pb-4">Dashboard</h1>
+        <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]"></span>
+      </div>
       <div className="text-[white]">
         <div className="flex justify-between gap-2">
           <div className="flex flex-col bg-[#232323] p-4 min-w-[200px] flex-1 rounded-md">
             <div className="flex justify-between items-center">
-              <span className="text-[22px]">100</span>
+              <span className="text-[22px]">{users?.length} persons</span>
               <i className="fa-solid fa-user-plus fa-beat"></i>
             </div>
             <p className="text-[#7b7e7e]">Users</p>
           </div>
           <div className="flex flex-col bg-[#232323] p-4 min-w-[200px] flex-1 rounded-md">
             <div className="flex justify-between items-center">
-              <span className="text-[22px]">100</span>
+              <span className="text-[22px]">
+                {amountOrder &&
+                  amountOrder
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
+                VND
+              </span>
               <i className="fa-solid fa-chart-line fa-beat"></i>
             </div>
             <p className="text-[#7b7e7e]">Revenue</p>
           </div>
           <div className="flex flex-col bg-[#232323] p-4 min-w-[200px] flex-1 rounded-md">
             <div className="flex justify-between items-center">
-              <span className="text-[22px]">{value?.totalProduct}</span>
+              <span className="text-[22px]">{totalProduct} items</span>
               <i className="fa-solid fa-book fa-beat"></i>
             </div>
             <p className="text-[#7b7e7e]">Products</p>
           </div>
           <div className="flex flex-col bg-[#232323] p-4 min-w-[200px] flex-1 rounded-md">
             <div className="flex justify-between items-center">
-              <span className="text-[22px]">100</span>
+              <span className="text-[22px]">{orders?.totalOrder} orders</span>
               <i className="fa-solid fa-cart-shopping fa-beat"></i>
             </div>
             <p className="text-[#7b7e7e]">Orders</p>
           </div>
         </div>
       </div>
+      {/* outcome */}
+
+      {/* list order */}
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-[white] text-[32px] pb-4">Manager Product</h1>
-          <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]"></span>
-        </div>
         <div className="text-[white] mt-12 text-[22px] text-center">
-          List Product
+          List Order
         </div>
         <table className="text-[#333] mt-4">
           <thead>
             <tr>
-              <th>Book Name</th>
-              <th>Author</th>
-              <th>Image</th>
-              <th>Price Origin</th>
-              <th>Price Pay</th>
-              <th>Barcode</th>
-              <th>Category</th>
-              <th>Count</th>
-              <th>Page Number</th>
-              <th>Flash Sale</th>
-              <th>Action</th>
+              <th>STT</th>
+              <th>Username </th>
+              <th>Email</th>
+              <th>Product</th>
+              <th>
+                Amount{" "}
+                <span
+                  className="text-[#07bc0c] cursor-pointer"
+                  onClick={() => handleSort("amount")}
+                >
+                  <ShowSort sort={sort} column="amount" />
+                </span>
+              </th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {orders &&
-              orders.products &&
-              orders.products.map((c) => {
+              orders.orders &&
+              orders.orders.map((c, i) => {
+                const status = {
+                  D0: "Delivering",
+                  D1: "Delivered",
+                  D2: "Canceled",
+                };
+                let currStatus = status[c.status];
+                let textColor;
+                if (c.status === "D0") textColor = "#da33caf2";
+                if (c.status === "D1") textColor = "#2acd2abd";
+                if (c.status === "D2") textColor = "red";
+
                 return (
                   <tr key={c._id}>
-                    <td className="capitalize">{c.name}</td>
-                    <td className="capitalize">{c.author}</td>
-                    <td className="flex flex-wrap gap-1">
-                      {c.pic.map((i) => {
+                    <td className="text-center">{i + 1}</td>
+                    <td className="capitalize">{c.userId.username}</td>
+                    <td className="">{c.userId.email}</td>
+                    <td className="">
+                      {c.items.map((i) => {
                         return (
-                          <span className="" key={i}>
-                            <img
-                              className="h-12"
-                              src={`${URL}/image/${i}`}
-                              alt="book"
-                            />
-                          </span>
+                          <div className="w-full" key={i._id}>
+                            <span>
+                              {i.itemId.name}({i.quantity})
+                            </span>
+                          </div>
                         );
                       })}
                     </td>
                     <td>
-                      {c.priceInput
+                      {c.amount
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
                       đ
                     </td>
-                    <td>
-                      {c.pricePay
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
-                      đ
-                    </td>
-                    <td>{c.barcode}</td>
-                    <td>{c.count} books</td>
-                    <td>{c.weight} pages</td>
+                    <td style={{ color: `${textColor}` }}>{currStatus}</td>
                   </tr>
                 );
               })}
@@ -163,7 +281,9 @@ export default function Home() {
             ) : (
               <span className="w-[45%]"></span>
             )}
-            <span>{orders.currPage}</span>
+            <span>
+              {orders.currPage} / {orders.totalPage}
+            </span>
             {orders?.nextPage ? (
               <span
                 className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] text-right justify-items-end"

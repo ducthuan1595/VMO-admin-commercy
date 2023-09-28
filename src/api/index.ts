@@ -118,13 +118,15 @@ export const requests = {
     sort: string | null,
     page: number | null,
     limit: number | null,
+    type: string | null,
+    column: string | null,
     itemId: string | null,
     token: string
   ) => {
     console.log("key", searchItem);
 
     return axios.get(
-      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${searchItem}&sort=${sort}`,
+      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${searchItem}&sort=${sort}&type=${type}&column=${column}`,
       {
         validateStatus: function (status: any) {
           return status < 500;
@@ -186,8 +188,28 @@ export const requests = {
       },
     });
   },
-  getOrder: (page: number, limit: number, token: string) => {
-    return axios.get(`${URL}/get-order?page=${page}&limit=${limit}`, {
+  getOrder: (
+    page: number,
+    limit: number,
+    type: string | null,
+    column: string | null,
+    token: string
+  ) => {
+    return axios.get(
+      `${URL}/get-order?page=${page}&limit=${limit}&type=${type}&column=${column}`,
+      {
+        validateStatus: function (status: any) {
+          return status < 500;
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+  // get users
+  getUser: (page: number, limit: number, key: string | null, token: string) => {
+    return axios.get(`${URL}/get-user?page=${page}&limit=${limit}&key=${key}`, {
       validateStatus: function (status: any) {
         return status < 500;
       },

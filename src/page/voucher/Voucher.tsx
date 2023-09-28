@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -13,7 +13,7 @@ interface Voucher {
   _id: string;
   code: string;
   discount: number;
-  expirationDate: string;
+  expirationDate: number;
   isActive: boolean;
   quantity: number;
   pic: string;
@@ -24,7 +24,6 @@ interface VoucherPage {
   nextPage: boolean;
   prevPage: boolean;
   totalVoucher: number;
-  activeVoucher: number;
   totalPage: number;
   vouchers: Voucher[];
 }
@@ -32,6 +31,7 @@ interface VoucherPage {
 export default function Voucher() {
   const value = useContext(context);
   const [vouchers, setVouchers] = useState<VoucherPage | null>(null);
+  const [voucherActive, setVoucherActive] = useState(0);
 
   const getVoucher = async (page: number | null): Promise<void> => {
     if (value && value.user && value.user.token) {
@@ -49,20 +49,17 @@ export default function Voucher() {
     getVoucher(1);
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (value && value.user && value.user.token) {
-      const object = {
-        voucherId: id,
-      };
-      const res = await requests.deleteVoucher(object, value.user.token);
-      if (res.data.message === "ok") {
-        handleToast(toast.success, "You removed successfully");
-        getVoucher(null);
-      } else {
-        handleToast(toast.error, res.data.message);
+  useEffect(() => {
+    const voucherActive = vouchers?.vouchers.filter((v) => {
+      if (v.expirationDate > Date.now()) {
+        return v;
       }
+    });
+
+    if (voucherActive) {
+      setVoucherActive(voucherActive?.length);
     }
-  };
+  }, [vouchers]);
 
   const handleNextPage = () => {
     if (vouchers && vouchers.currPage && vouchers.nextPage) {
@@ -77,13 +74,15 @@ export default function Voucher() {
     }
   };
 
+  console.log({ voucherActive });
+
   return (
     <MainLayout>
       <div>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-[white] text-[32px] pb-4">Manager Voucher</h1>
           <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]">
-            Active ( {vouchers?.activeVoucher} / {vouchers?.totalVoucher} )
+            Active ( {voucherActive} / {vouchers?.totalVoucher} )
           </span>
         </div>
         <AddVoucher getVoucher={getVoucher} />
@@ -106,6 +105,17 @@ export default function Voucher() {
             {vouchers &&
               vouchers.vouchers &&
               vouchers.vouchers.map((v, i) => {
+                const handleShowDate = (time: number) => {
+                  const date = new Date(time);
+
+                  return ` ${
+                    date.getDate() > 10 ? date.getDate() : "0" + date.getDate()
+                  }/${
+                    date.getMonth() + 1 > 10
+                      ? date.getMonth() + 1
+                      : "0" + (date.getMonth() + 1)
+                  }/${date.getFullYear()}`;
+                };
                 return (
                   <tr key={v._id}>
                     <td className="text-center">{i + 1}</td>
@@ -118,10 +128,10 @@ export default function Voucher() {
                       />
                     </td>
                     <td>{v.discount}</td>
-                    <td>{v.expirationDate}</td>
+                    <td>{handleShowDate(v.expirationDate)}</td>
                     <td>{v.quantity}</td>
                     <td className="text-center">
-                      {v.isActive ? (
+                      {v.expirationDate > Date.now() ? (
                         <i className="fa-solid fa-circle-check text-[green]"></i>
                       ) : (
                         <i className="fa-solid fa-circle-xmark text-[#ff1e00d0]"></i>

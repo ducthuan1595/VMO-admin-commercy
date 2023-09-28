@@ -10,6 +10,8 @@ import { URL } from "../../api";
 import handleToast from "../../util/toast";
 import { CategoryType } from "../category/Category";
 import { FlashSaleType } from "../flashSale/FlashSale";
+import ShowSort from "../../util/ShowSort";
+import { SortType } from "../../util/ShowSort";
 
 export interface ItemType {
   _id: string;
@@ -43,8 +45,16 @@ export default function Item() {
 
   const [item, setItem] = useState<ItemStateType | null>(null);
   const [detailItem, setDetailItem] = useState<ItemType | null>(null);
+  const [sort, setSort] = useState<SortType>({
+    type: "default",
+    column: "",
+  });
 
-  const getItem = async (page: number | null) => {
+  const getItem = async (
+    page: number | null,
+    type: string | null,
+    column: string | null
+  ) => {
     if (value && value.user && value.user.token) {
       const limit: number = 8;
       const res = await requests.getItem(
@@ -53,11 +63,13 @@ export default function Item() {
         null,
         page,
         limit,
+        type,
+        column,
         null,
         value.user.token
       );
 
-      console.log(res.data);
+      console.log(res.data.data);
 
       if (res.data.message === "ok") {
         setItem(res.data.data);
@@ -66,8 +78,14 @@ export default function Item() {
     }
   };
   useEffect(() => {
-    getItem(1);
+    getItem(1, null, null);
   }, []);
+
+  useEffect(() => {
+    if (sort && sort.type && sort.column) {
+      getItem(1, sort.type, sort.column);
+    }
+  }, [sort]);
 
   const handleDelete = async (id: string) => {
     if (value && value.user && value.user.token) {
@@ -77,7 +95,7 @@ export default function Item() {
       const res = await requests.deleteItem(object, value.user.token);
       if (res.data.message === "ok") {
         handleToast(toast.success, "You removed successfully");
-        getItem(1);
+        getItem(1, null, null);
       } else {
         handleToast(toast.error, res.data.message);
       }
@@ -92,10 +110,11 @@ export default function Item() {
         null,
         null,
         null,
+        null,
+        null,
         id,
         value.user.token
       );
-      console.log("detail item", res);
 
       if (res.data.message === "ok") {
         setDetailItem(res.data.data);
@@ -104,18 +123,24 @@ export default function Item() {
     }
   };
 
+  const handleSort = (column: string) => {
+    setSort({
+      ...sort,
+      column: column,
+      type: sort.type === "desc" ? "asc" : "desc",
+    });
+  };
+
   const handleNextPage = () => {
     if (item && item.currPage && item.nextPage) {
-      console.log(item.currPage);
-
       const page = +item.currPage + 1;
-      getItem(page);
+      getItem(page, null, null);
     }
   };
   const handlePrevPage = () => {
     if (item && item.currPage && item.prevPage) {
       const page = +item.currPage - 1;
-      getItem(page);
+      getItem(page, null, null);
     }
   };
 
@@ -126,18 +151,54 @@ export default function Item() {
           <h1 className="text-[white] text-[32px] pb-4">Manager Product</h1>
           <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]"></span>
         </div>
-        <AddItem getItem={getItem} detailItem={detailItem} />
+        <AddItem
+          getItem={getItem}
+          detailItem={detailItem}
+          setDetailItem={setDetailItem}
+        />
         <div className="text-[white] mt-12 text-[22px] text-center">
           List Product
         </div>
         <table className="text-[#333] mt-4">
           <thead>
             <tr>
-              <th>Book Name</th>
-              <th>Author</th>
+              <th className="">
+                Book Name{" "}
+                <span
+                  className="text-[#07bc0c] cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
+                  <ShowSort column="name" sort={sort} />
+                </span>
+              </th>
+              <th>
+                Author{" "}
+                <span
+                  className="text-[#07bc0c] cursor-pointer"
+                  onClick={() => handleSort("author")}
+                >
+                  <ShowSort column="author" sort={sort} />
+                </span>
+              </th>
               <th>Image</th>
-              <th>Price Origin</th>
-              <th>Price Pay</th>
+              <th className="w-[126px]">
+                Price Origin{" "}
+                <span
+                  className="text-[#07bc0c] cursor-pointer"
+                  onClick={() => handleSort("priceInput")}
+                >
+                  <ShowSort column="priceInput" sort={sort} />
+                </span>
+              </th>
+              <th className="w-[112px]">
+                Price Pay{" "}
+                <span
+                  className="text-[#07bc0c] cursor-pointer"
+                  onClick={() => handleSort("pricePay")}
+                >
+                  <ShowSort column="pricePay" sort={sort} />
+                </span>
+              </th>
               <th>Barcode</th>
               <th>Category</th>
               <th>Count</th>

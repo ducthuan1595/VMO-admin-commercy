@@ -100,8 +100,14 @@ export default function FlashSale() {
                   const date = new Date(time);
 
                   return `${
-                    date.getHours() + 1
-                  }:${date.getMinutes()} - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+                    date.getHours() + 1 > 10
+                      ? date.getHours() + 1
+                      : date.getHours() + 1 + "0"
+                  }:${
+                    date.getMinutes() > 10
+                      ? date.getMinutes()
+                      : date.getMinutes() + "0"
+                  } - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
                 };
 
                 return (
@@ -144,7 +150,9 @@ export default function FlashSale() {
             ) : (
               <span className="w-[45%]"></span>
             )}
-            <span>{flashSales.currPage}</span>
+            <span>
+              {flashSales.currPage} / {flashSales.totalPage}
+            </span>
             {flashSales?.nextPage ? (
               <span
                 className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] text-right justify-items-end"

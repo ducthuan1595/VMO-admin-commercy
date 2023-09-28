@@ -67,6 +67,8 @@ const AddFlashSale = ({
         null,
         null,
         null,
+        null,
+        null,
         token
       );
 
