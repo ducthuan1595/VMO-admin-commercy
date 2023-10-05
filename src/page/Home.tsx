@@ -65,6 +65,7 @@ export default function Home() {
         type,
         column,
         null,
+        false,
         value.user.token
       );
 
@@ -173,7 +174,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <span className="text-[22px]">
                 {amountOrder &&
-                  amountOrder
+                  Math.floor(amountOrder)
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}{" "}
                 VND
@@ -242,7 +243,7 @@ export default function Home() {
                 return (
                   <tr key={c._id}>
                     <td className="text-center">{i + 1}</td>
-                    <td className="capitalize">{c.userId.username}</td>
+                    <td className="capitalize">{c.userId?.username}</td>
                     <td className="">{c.userId.email}</td>
                     <td className="">
                       {c.items.map((i) => {

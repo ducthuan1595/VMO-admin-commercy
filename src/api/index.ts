@@ -66,10 +66,12 @@ export const requests = {
     page: number | null,
     limit: number | null,
     categoryId: string | null,
+    type: string | null,
+    column: string | null,
     token: string
   ) => {
     return axios.get(
-      `${URL}/get-all-category?page=${page}&limit=${limit}&categoryId=${categoryId}`,
+      `${URL}/get-all-category?page=${page}&limit=${limit}&categoryId=${categoryId}&type=${type}&column=${column}`,
       {
         validateStatus: function (status: any) {
           return status < 500;
@@ -121,12 +123,13 @@ export const requests = {
     type: string | null,
     column: string | null,
     itemId: string | null,
+    isSale: boolean,
     token: string
   ) => {
     console.log("key", searchItem);
 
     return axios.get(
-      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${searchItem}&sort=${sort}&type=${type}&column=${column}`,
+      `${URL}/get-item?page=${page}&limit=${limit}&itemId=${itemId}&filter=${filter}&key=${searchItem}&sort=${sort}&type=${type}&column=${column}&isSale=${isSale}`,
       {
         validateStatus: function (status: any) {
           return status < 500;

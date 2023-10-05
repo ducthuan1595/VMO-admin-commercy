@@ -56,7 +56,7 @@ export default function Item() {
     column: string | null
   ) => {
     if (value && value.user && value.user.token) {
-      const limit: number = 8;
+      const limit: number = 10;
       const res = await requests.getItem(
         null,
         null,
@@ -66,6 +66,7 @@ export default function Item() {
         type,
         column,
         null,
+        false,
         value.user.token
       );
 
@@ -83,21 +84,24 @@ export default function Item() {
 
   useEffect(() => {
     if (sort && sort.type && sort.column) {
-      getItem(1, sort.type, sort.column);
+      getItem(item?.currPage ? item?.currPage : null, sort.type, sort.column);
     }
   }, [sort]);
 
   const handleDelete = async (id: string) => {
-    if (value && value.user && value.user.token) {
-      const object = {
-        itemId: id,
-      };
-      const res = await requests.deleteItem(object, value.user.token);
-      if (res.data.message === "ok") {
-        handleToast(toast.success, "You removed successfully");
-        getItem(1, null, null);
-      } else {
-        handleToast(toast.error, res.data.message);
+    const isConfirm = window.confirm("Are you sure?");
+    if (isConfirm) {
+      if (value && value.user && value.user.token) {
+        const object = {
+          itemId: id,
+        };
+        const res = await requests.deleteItem(object, value.user.token);
+        if (res.data.message === "ok") {
+          handleToast(toast.success, "You removed successfully");
+          getItem(1, null, null);
+        } else {
+          handleToast(toast.error, res.data.message);
+        }
       }
     }
   };
@@ -113,6 +117,7 @@ export default function Item() {
         null,
         null,
         id,
+        false,
         value.user.token
       );
 
@@ -149,7 +154,9 @@ export default function Item() {
       <div>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-[white] text-[32px] pb-4">Manager Product</h1>
-          <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]"></span>
+          <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]">
+            {item?.totalNumber}
+          </span>
         </div>
         <AddItem
           getItem={getItem}
@@ -181,7 +188,7 @@ export default function Item() {
                 </span>
               </th>
               <th>Image</th>
-              <th className="w-[126px]">
+              <th className="w-[140px]">
                 Price Origin{" "}
                 <span
                   className="text-[#07bc0c] cursor-pointer"
@@ -190,7 +197,7 @@ export default function Item() {
                   <ShowSort column="priceInput" sort={sort} />
                 </span>
               </th>
-              <th className="w-[112px]">
+              <th className="w-[120px]">
                 Price Pay{" "}
                 <span
                   className="text-[#07bc0c] cursor-pointer"
@@ -279,7 +286,9 @@ export default function Item() {
             ) : (
               <span className="w-[45%]"></span>
             )}
-            <span>{item.currPage}</span>
+            <span>
+              {item.currPage}/{item.totalPage}
+            </span>
             {item?.nextPage ? (
               <span
                 className="cursor-pointer border-[1px] py-2 rounded-lg border-[#383838] w-[45%] text-right justify-items-end"

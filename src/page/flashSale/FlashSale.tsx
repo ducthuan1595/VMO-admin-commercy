@@ -40,7 +40,7 @@ export default function FlashSale() {
 
   const getFlashSales = async (page: number | null): Promise<void> => {
     if (value && value.user && value.user.token) {
-      const limit = 8;
+      const limit = 5;
       const res = await requests.getFlashSale(page, limit, value.user.token);
 
       if (res.data.message === "ok") {
@@ -107,7 +107,9 @@ export default function FlashSale() {
                     date.getMinutes() > 10
                       ? date.getMinutes()
                       : date.getMinutes() + "0"
-                  } - ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+                  } - ${date.getDate()}/${
+                    date.getMonth() + 1
+                  }/${date.getFullYear()}`;
                 };
 
                 return (

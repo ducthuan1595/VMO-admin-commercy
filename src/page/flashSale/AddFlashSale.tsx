@@ -22,6 +22,11 @@ export interface ItemFlashSaleType {
   quantity: number;
 }
 
+export interface ItemStateFlashSaleType {
+  arrItem: ItemFlashSaleType[] | [];
+  setArrItem: React.Dispatch<React.SetStateAction<ItemFlashSaleType[] | []>>;
+}
+
 function debounce(fn: () => Promise<void>, ms: number) {
   let timer: NodeJS.Timeout;
 
@@ -45,8 +50,8 @@ const AddFlashSale = ({
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [discountPercent, setDiscountPercent] = useState("");
-  const [items, setItems] = useState<ItemType[]>([]);
-  const [arrItem, setArrItem] = useState<ItemFlashSaleType[]>([]);
+  const [items, setItems] = useState<ItemType[] | null>([]);
+  const [arrItem, setArrItem] = useState<ItemFlashSaleType[] | []>([]);
 
   const filterPassedTime = (time: any) => {
     const currentDate = new Date();
@@ -69,6 +74,7 @@ const AddFlashSale = ({
         null,
         null,
         null,
+        true,
         token
       );
 
@@ -99,6 +105,7 @@ const AddFlashSale = ({
         discountPercent,
         arrItem,
       };
+      console.log({ valueInput });
 
       const res = await requests.createFlashSale(
         valueInput,
@@ -114,6 +121,7 @@ const AddFlashSale = ({
         setStartDate(undefined);
         setEndDate(undefined);
         setArrItem([]);
+        setItems(null);
       } else {
         handleToast(toast.error, res.data.message);
       }
@@ -190,7 +198,7 @@ const AddFlashSale = ({
               ref={searchItem}
               // value={searchItem}
             />
-            <CheckBox items={items} setArrItem={setArrItem} />
+            <CheckBox items={items} setArrItem={setArrItem} arrItem={arrItem} />
           </div>
         </div>
         <button

@@ -27,7 +27,6 @@ const AddItem = ({
   const [name, setName] = useState("");
   const [author, setAuthor] = useState("");
   const [priceInput, setPriceInput] = useState<number | string>("");
-  const [pricePay, setPricePay] = useState<number | string>("");
   const [description, setDescription] = useState("");
   const [slogan, setSlogan] = useState("");
   const [barcode, setBarcode] = useState("");
@@ -43,7 +42,6 @@ const AddItem = ({
       setName(detailItem.name);
       setAuthor(detailItem.author);
       setPriceInput(detailItem.priceInput);
-      setPricePay(detailItem.pricePay);
       setSlogan(detailItem.slogan);
       setBarcode(detailItem.barcode);
       setDescription(detailItem.description);
@@ -57,6 +55,8 @@ const AddItem = ({
     const getCategory = async (page: number | null) => {
       if (storeValue && storeValue.user && storeValue.user.token) {
         const res = await requests.getCategory(
+          null,
+          null,
           null,
           null,
           null,
@@ -111,7 +111,6 @@ const AddItem = ({
         formData.append("itemId", detailItem._id);
         formData.append("author", author);
         formData.append("priceInput", priceInput.toString());
-        formData.append("pricePay", pricePay.toString());
         formData.append("categoryId", selectCategory);
         formData.append("slogan", slogan);
         formData.append("description", description);
@@ -128,7 +127,6 @@ const AddItem = ({
           setAuthor("");
           setDescription("");
           setPriceInput("");
-          setPricePay("");
           setSlogan("");
           setCount("");
           setBarcode("");
@@ -157,7 +155,6 @@ const AddItem = ({
         formData.append("name", name);
         formData.append("author", author);
         formData.append("priceInput", priceInput.toString());
-        formData.append("pricePay", pricePay.toString());
         formData.append("slogan", slogan);
         formData.append("description", description);
         formData.append("categoryId", selectCategory);
@@ -173,7 +170,6 @@ const AddItem = ({
           setAuthor("");
           setDescription("");
           setPriceInput("");
-          setPricePay("");
           setSlogan("");
           setCount("");
           setBarcode("");
@@ -224,7 +220,7 @@ const AddItem = ({
           </div>
           <div className="flex justify-between items-center gap-8">
             <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Origin Price</label>
+              <label htmlFor="">Price</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="number"
@@ -234,17 +230,7 @@ const AddItem = ({
                 value={priceInput}
               />
             </div>
-            <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Pay Price</label>
-              <input
-                className="p-2 rounded-md text-[#333]"
-                type="number"
-                name="pricePay"
-                placeholder="100000"
-                onChange={(e) => setPricePay(e.target.value)}
-                value={pricePay}
-              />
-            </div>
+
             <div className="flex flex-1 flex-col gap-2 mb-4">
               <label htmlFor="">Barcode</label>
               <input

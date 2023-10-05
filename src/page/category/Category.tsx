@@ -8,6 +8,8 @@ import { requests } from "../../api";
 import { context } from "../../store";
 import { URL } from "../../api";
 import handleToast from "../../util/toast";
+import ShowSort from "../../util/ShowSort";
+import { SortType } from "../../util/ShowSort";
 
 export interface CategoryType {
   _id: string;
@@ -34,16 +36,27 @@ export default function Category() {
   const [detailCategory, setDetailCategory] = useState<CategoryType | null>(
     null
   );
+  const [sort, setSort] = useState<SortType>({
+    type: "default",
+    column: "",
+  });
 
-  const getCategory = async (page: number | null) => {
+  const getCategory = async (
+    page: number | null,
+    type: string | null,
+    column: string | null
+  ) => {
     if (value && value.user && value.user.token) {
-      const limit: number = 8;
+      const limit: number = 10;
       const res = await requests.getCategory(
         page,
         limit,
         null,
+        type,
+        column,
         value.user.token
       );
+      console.log(res.data.data);
 
       if (res.data.message === "ok") {
         setCategories(res.data.data);
@@ -51,27 +64,37 @@ export default function Category() {
     }
   };
   useEffect(() => {
-    getCategory(1);
+    getCategory(1, null, null);
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (value && value.user && value.user.token) {
-      const object = {
-        categoryId: id,
-      };
-      const res = await requests.deleteCategory(object, value.user.token);
-      if (res.data.message === "ok") {
-        handleToast(toast.success, "You removed successfully");
-        getCategory(null);
-      } else {
-        handleToast(toast.error, res.data.message);
+    const isConfirm = window.confirm("Are you sure?");
+    if (isConfirm) {
+      if (value && value.user && value.user.token) {
+        const object = {
+          categoryId: id,
+        };
+        const res = await requests.deleteCategory(object, value.user.token);
+        if (res.data.message === "ok") {
+          handleToast(toast.success, "You removed successfully");
+          getCategory(1, null, null);
+        } else {
+          handleToast(toast.error, res.data.message);
+        }
       }
     }
   };
 
   const handleEdit = async (id: string) => {
     if (value && value.user && value.user.token) {
-      const res = await requests.getCategory(null, null, id, value.user.token);
+      const res = await requests.getCategory(
+        null,
+        null,
+        id,
+        null,
+        null,
+        value.user.token
+      );
       if (res.data.message === "ok") {
         setDetailCategory(res.data.data);
         window.scrollTo(0, 0);
@@ -79,16 +102,30 @@ export default function Category() {
     }
   };
 
+  useEffect(() => {
+    if (categories?.currPage && sort && sort.type && sort.column) {
+      getCategory(categories.currPage, sort.type, sort.column);
+    }
+  }, [sort]);
+
+  const handleSort = (column: string) => {
+    setSort({
+      ...sort,
+      column: column,
+      type: sort.type === "desc" ? "asc" : "desc",
+    });
+  };
+
   const handleNextPage = () => {
     if (categories && categories.currPage && categories.nextPage) {
       const page = +categories.currPage + 1;
-      getCategory(page);
+      getCategory(page, null, null);
     }
   };
   const handlePrevPage = () => {
     if (categories && categories.currPage && categories.prevPage) {
       const page = +categories.currPage - 1;
-      getCategory(page);
+      getCategory(page, null, null);
     }
   };
 
@@ -113,7 +150,15 @@ export default function Category() {
               <th>Name Category</th>
               <th>Banner</th>
               <th>Description</th>
-              <th>Role</th>
+              <th>
+                Position{" "}
+                <span
+                  className="text-[#07bc0c] cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
+                  <ShowSort column="name" sort={sort} />
+                </span>
+              </th>
               <th>Active</th>
               <th>Action</th>
             </tr>

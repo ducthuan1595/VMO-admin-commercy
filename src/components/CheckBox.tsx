@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { ItemType } from "../page/item/Item";
+import { ItemStateFlashSaleType } from "../page/flashSale/AddFlashSale";
 import { ItemFlashSaleType } from "../page/flashSale/AddFlashSale";
 
 export default function CheckBox({
   items,
   setArrItem,
+  arrItem,
 }: {
-  items: ItemType[];
+  items: ItemType[] | null;
   setArrItem: any;
+  arrItem: any;
 }) {
-  const [itemsValue, setItemsValue] = useState<
-    { itemId: string; quantity: number }[]
-  >([]);
-
   const handleSelectItem = (
     e: React.ChangeEvent<HTMLInputElement>,
     itemId: string
   ) => {
     if (e.target.checked) {
-      setItemsValue([...itemsValue, { itemId, quantity: 0 }]);
+      setArrItem([...arrItem, { itemId, quantity: 0 }]);
     } else {
-      setItemsValue(itemsValue.filter((cp) => cp.itemId !== itemId));
+      setArrItem(arrItem.filter((cp: any) => cp.itemId !== itemId));
     }
   };
 
@@ -28,24 +27,26 @@ export default function CheckBox({
     e: React.ChangeEvent<HTMLInputElement>,
     itemId: string
   ) => {
-    const index = itemsValue.findIndex((i) => i.itemId === itemId);
+    const index = arrItem.findIndex((i: any) => i.itemId === itemId);
     if (index >= 0) {
       const updatedItem = {
-        ...itemsValue[index],
+        ...arrItem[index],
         quantity: Number(e.target.value),
       };
-      setItemsValue([
-        ...itemsValue.slice(0, index),
+      setArrItem([
+        ...arrItem.slice(0, index),
         updatedItem,
-        ...itemsValue.slice(index + 1),
+        ...arrItem.slice(index + 1),
       ]);
     }
   };
-  console.log(itemsValue);
+  console.log(arrItem);
 
-  useEffect(() => {
-    setArrItem(itemsValue);
-  }, [itemsValue]);
+  // useEffect(() => {
+  //   if (itemsValue.length && setArrItem) {
+  //     setArrItem(itemsValue);
+  //   }
+  // }, [itemsValue]);
 
   return (
     <div>

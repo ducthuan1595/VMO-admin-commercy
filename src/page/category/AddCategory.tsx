@@ -13,7 +13,11 @@ const AddCategory = ({
   detailCategory,
   setDetailCategory,
 }: {
-  getCategory: (num: number | null) => Promise<void>;
+  getCategory: (
+    num: number | null,
+    type: string | null,
+    column: string | null
+  ) => Promise<void>;
   detailCategory: CategoryType | null;
   setDetailCategory: React.Dispatch<React.SetStateAction<CategoryType | null>>;
 }) => {
@@ -68,8 +72,8 @@ const AddCategory = ({
           storeValue.user.token
         );
         if (res.data.message === "ok") {
-          getCategory(1);
           handleToast(toast.success, "Update category successfully!");
+          getCategory(Number(1), null, null);
           setName("");
           setBanner(null);
           setDescription("");
@@ -94,7 +98,7 @@ const AddCategory = ({
 
         const res = await requests.addCategory(formData, storeValue.user.token);
         if (res.data.message === "ok") {
-          getCategory(null);
+          getCategory(1, null, null);
           handleToast(toast.success, "Add category successfully!");
           setName("");
           setBanner(null);
