@@ -1,6 +1,8 @@
 import axios from "axios";
 
 export const SERVER_URL = process.env.REACT_APP_API_URL;
+console.log(SERVER_URL);
+
 export const URL = SERVER_URL + "/api";
 
 interface Value {
