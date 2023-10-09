@@ -46,12 +46,12 @@ const AddCategory = ({
   }, [detailCategory]);
 
   const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0 && detailCategory) {
+    if (e.target.files && e.target.files.length > 0) {
       const files = e.target.files[0];
       if (files) {
         try {
           setIsLoading(true);
-          await destroyCloudinary(detailCategory.banner.public_id);
+          // await destroyCloudinary(detailCategory.banner.public_id);
           const res = await uploadCloudinary(files);
           if (res) {
             setBanner(res);

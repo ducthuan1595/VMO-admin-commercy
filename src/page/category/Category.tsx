@@ -78,7 +78,6 @@ export default function Category() {
         const object = {
           categoryId: id,
         };
-        destroyCloudinary(publicId);
         const res = await requests.deleteCategory(object, value.user.token);
         if (res.data.message === "ok") {
           handleToast(toast.success, "You removed successfully");
