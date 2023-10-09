@@ -12,12 +12,13 @@ import { CategoryType } from "../category/Category";
 import { FlashSaleType } from "../flashSale/FlashSale";
 import ShowSort from "../../util/ShowSort";
 import { SortType } from "../../util/ShowSort";
+import { UploadCloudinaryType } from "../../model";
 
 export interface ItemType {
   _id: string;
   name: string;
   author: string;
-  pic: string[];
+  pic: UploadCloudinaryType[];
   description: string;
   pricePay: number;
   priceInput: number;
@@ -27,7 +28,7 @@ export interface ItemType {
   weight: number;
   flashSaleId: FlashSaleType;
   categoryId: CategoryType;
-  detailPic: string[];
+  detailPic: UploadCloudinaryType[];
 }
 
 interface ItemStateType {
@@ -160,6 +161,7 @@ export default function Item() {
         </div>
         <AddItem
           getItem={getItem}
+          currPage={item?.currPage}
           detailItem={detailItem}
           setDetailItem={setDetailItem}
         />
@@ -225,12 +227,8 @@ export default function Item() {
                     <td className="flex flex-wrap gap-1">
                       {c.pic.map((i) => {
                         return (
-                          <span className="" key={i}>
-                            <img
-                              className="h-12"
-                              src={`${URL}/image/${i}`}
-                              alt="book"
-                            />
+                          <span className="" key={i.url}>
+                            <img className="h-12" src={i.url} alt="book" />
                           </span>
                         );
                       })}

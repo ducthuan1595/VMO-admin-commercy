@@ -1,7 +1,6 @@
 import axios from "axios";
 
 export const SERVER_URL = process.env.REACT_APP_API_URL;
-console.log(SERVER_URL);
 
 export const URL = SERVER_URL + "/api";
 
@@ -43,14 +42,14 @@ export const requests = {
       },
     });
   },
-  addVoucher: (value: object, token: string) => {
+  addVoucher: (value: any, token: string) => {
     return axios.post(`${URL}/create-voucher`, value, {
       validateStatus: function (status: any) {
         return status < 500;
       },
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
+        // "Content-Type": "multipart/form-data",
       },
     });
   },
@@ -91,7 +90,7 @@ export const requests = {
       },
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
+        // "Content-Type": "multipart/form-data",
       },
     });
   },

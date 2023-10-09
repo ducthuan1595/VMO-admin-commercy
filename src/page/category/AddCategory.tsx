@@ -7,6 +7,9 @@ import { requests } from "../../api";
 import { context } from "../../store";
 import handleToast from "../../util/toast";
 import { CategoryType } from "./Category";
+import { destroyCloudinary } from "../../util/uploadFile";
+import { uploadCloudinary } from "../../util/uploadFile";
+import { UploadCloudinaryType } from "../../model";
 
 const AddCategory = ({
   getCategory,
@@ -25,7 +28,11 @@ const AddCategory = ({
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [banner, setBanner] = useState<FileList | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [banner, setBanner] = useState<UploadCloudinaryType>({
+    url: "",
+    public_id: "",
+  });
   const [position, setPosition] = useState<number | string>("");
   const [isActive, setIsActive] = useState("1");
 
@@ -38,11 +45,23 @@ const AddCategory = ({
     }
   }, [detailCategory]);
 
-  const handleUploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const files = e.target.files;
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0 && detailCategory) {
+      const files = e.target.files[0];
       if (files) {
-        setBanner(files);
+        try {
+          setIsLoading(true);
+          await destroyCloudinary(detailCategory.banner.public_id);
+          const res = await uploadCloudinary(files);
+          if (res) {
+            setBanner(res);
+            setIsLoading(false);
+          }
+        } catch (err) {
+          setIsLoading(false);
+
+          console.log(err);
+        }
       }
     }
   };
@@ -54,28 +73,30 @@ const AddCategory = ({
   const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (detailCategory) {
-      if (storeValue && storeValue.user && position) {
-        const formData = new FormData();
-        if (banner) {
-          for (let i = 0; i < banner.length; i++) {
-            formData.append("banner", banner[i]);
-          }
-        }
-        formData.append("name", name);
-        formData.append("categoryId", detailCategory._id);
-        formData.append("description", description);
-        formData.append("position", position.toString());
-        formData.append("isActive", isActive.toString());
-
-        const res = await requests.editCategory(
-          formData,
-          storeValue.user.token
-        );
+      if (
+        storeValue &&
+        storeValue.user &&
+        position &&
+        banner.url &&
+        !isLoading
+      ) {
+        const values = {
+          name,
+          description,
+          position,
+          isActive,
+          banner,
+          categoryId: detailCategory._id,
+        };
+        const res = await requests.editCategory(values, storeValue.user.token);
         if (res.data.message === "ok") {
           handleToast(toast.success, "Update category successfully!");
           getCategory(Number(1), null, null);
           setName("");
-          setBanner(null);
+          setBanner({
+            url: "",
+            public_id: "",
+          });
           setDescription("");
           setPosition("");
           setDetailCategory(null);
@@ -86,22 +107,31 @@ const AddCategory = ({
         handleToast(toast.warning, "Not empty fields");
       }
     } else {
-      if (storeValue && storeValue.user && banner && position) {
-        const formData = new FormData();
-        for (let i = 0; i < banner.length; i++) {
-          formData.append("banner", banner[i]);
-        }
-        formData.append("name", name);
-        formData.append("description", description);
-        formData.append("position", position.toString());
-        formData.append("isActive", isActive.toString());
+      if (
+        storeValue &&
+        storeValue.user &&
+        banner &&
+        banner.url &&
+        position &&
+        !isLoading
+      ) {
+        const values = {
+          name,
+          description,
+          position,
+          isActive,
+          banner,
+        };
 
-        const res = await requests.addCategory(formData, storeValue.user.token);
+        const res = await requests.addCategory(values, storeValue.user.token);
         if (res.data.message === "ok") {
           getCategory(1, null, null);
           handleToast(toast.success, "Add category successfully!");
           setName("");
-          setBanner(null);
+          setBanner({
+            url: "",
+            public_id: "",
+          });
           setDescription("");
           setPosition("");
         } else {
@@ -112,6 +142,8 @@ const AddCategory = ({
       }
     }
   };
+
+  console.log({ banner });
 
   return (
     <div className="text-[white]">
@@ -181,8 +213,13 @@ const AddCategory = ({
         <button
           onClick={handleAdd}
           className="rounded-lg bg-[#383838] py-2 px-4 hover:opacity-80"
+          disabled={isLoading}
         >
-          {detailCategory ? "Edit" : "Add"}
+          {isLoading ? (
+            <i className="fa-solid fa-spinner animate-spin"></i>
+          ) : (
+            <span>{detailCategory ? "Edit" : "Add"}</span>
+          )}
         </button>
       </form>
     </div>

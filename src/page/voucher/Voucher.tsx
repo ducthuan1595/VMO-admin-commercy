@@ -8,6 +8,7 @@ import { requests } from "../../api";
 import { context } from "../../store";
 import handleToast from "../../util/toast";
 import { URL } from "../../api";
+import { UploadCloudinaryType } from "../../model";
 
 interface Voucher {
   _id: string;
@@ -16,7 +17,7 @@ interface Voucher {
   expirationDate: number;
   isActive: boolean;
   quantity: number;
-  pic: string;
+  pic: UploadCloudinaryType;
 }
 
 interface VoucherPage {
@@ -74,8 +75,6 @@ export default function Voucher() {
     }
   };
 
-  console.log({ voucherActive });
-
   return (
     <MainLayout>
       <div>
@@ -121,11 +120,7 @@ export default function Voucher() {
                     <td className="text-center">{i + 1}</td>
                     <td>{v.code}</td>
                     <td>
-                      <img
-                        className="h-12"
-                        src={`${URL}/image/${v.pic}`}
-                        alt="voucher"
-                      />
+                      <img className="h-12" src={v.pic.url} alt="voucher" />
                     </td>
                     <td>{v.discount}</td>
                     <td>{handleShowDate(v.expirationDate)}</td>

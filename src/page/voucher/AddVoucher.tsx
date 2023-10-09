@@ -8,6 +8,8 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import { requests } from "../../api";
 import { context } from "../../store";
 import handleToast from "../../util/toast";
+import { uploadCloudinary } from "../../util/uploadFile";
+import { UploadCloudinaryType } from "../../model";
 
 const AddVoucher = ({
   getVoucher,
@@ -20,32 +22,52 @@ const AddVoucher = ({
   const [openDate, setOpenDate] = useState(false);
   const [expirateDate, setExpirateDate] = useState(new Date());
   const [discount, setDiscount] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [pic, setPic] = useState<UploadCloudinaryType>({
+    url: "",
+    public_id: "",
+  });
   const [quantity, setQuantity] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleUploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setImage(file);
+      if (file) {
+        try {
+          setIsLoading(true);
+          const res = await uploadCloudinary(file);
+          if (res) {
+            setPic(res);
+            setIsLoading(false);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
     }
   };
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const dateTime = expirateDate.getTime();
-    if (storeValue && storeValue.user && dateTime && image) {
-      const formData = new FormData();
-      formData.append("code", code);
-      formData.append("expiration", dateTime.toString());
-      formData.append("discount", discount);
-      formData.append("pic", image);
-      formData.append("quantity", quantity);
+    const dateTime = new Date(expirateDate).getTime();
+    if (storeValue && storeValue.user && dateTime && pic.url && !isLoading) {
+      const values = {
+        code,
+        expirationDate: dateTime,
+        discount,
+        pic,
+        quantity,
+      };
 
-      const res = await requests.addVoucher(formData, storeValue.user.token);
+      const res = await requests.addVoucher(values, storeValue.user.token);
       if (res.data.message === "ok") {
         getVoucher(1);
         handleToast(toast.success, "Add voucher successfully!");
         setCode("");
+        setPic({
+          url: "",
+          public_id: "",
+        });
         setDiscount("");
         setQuantity("");
       } else {
@@ -130,7 +152,11 @@ const AddVoucher = ({
           onClick={handleAdd}
           className="rounded-lg bg-[#383838] py-2 px-4 hover:opacity-80"
         >
-          ADD
+          {isLoading ? (
+            <i className="fa-solid fa-spinner animate-spin"></i>
+          ) : (
+            "ADD"
+          )}
         </button>
       </form>
     </div>

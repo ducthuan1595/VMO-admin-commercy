@@ -10,11 +10,15 @@ import { URL } from "../../api";
 import handleToast from "../../util/toast";
 import ShowSort from "../../util/ShowSort";
 import { SortType } from "../../util/ShowSort";
+import { destroyCloudinary } from "../../util/uploadFile";
 
 export interface CategoryType {
   _id: string;
   name: string;
-  banner: string[];
+  banner: {
+    url: string;
+    public_id: string;
+  };
   description: string;
   active: boolean;
   position: number;
@@ -67,13 +71,14 @@ export default function Category() {
     getCategory(1, null, null);
   }, []);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, publicId: string) => {
     const isConfirm = window.confirm("Are you sure?");
     if (isConfirm) {
       if (value && value.user && value.user.token) {
         const object = {
           categoryId: id,
         };
+        destroyCloudinary(publicId);
         const res = await requests.deleteCategory(object, value.user.token);
         if (res.data.message === "ok") {
           handleToast(toast.success, "You removed successfully");
@@ -171,17 +176,11 @@ export default function Category() {
                   <tr key={c._id}>
                     <td className="capitalize">{c.name}</td>
                     <td className="flex flex-wrap gap-1">
-                      {c.banner.map((i) => {
-                        return (
-                          <span className="" key={i}>
-                            <img
-                              className="h-12"
-                              src={`${URL}/image/${i}`}
-                              alt="category"
-                            />
-                          </span>
-                        );
-                      })}
+                      <img
+                        className="h-12"
+                        src={c.banner?.url}
+                        alt="category"
+                      />
                     </td>
                     <td>{c.description}</td>
                     <td>{c.position}</td>
@@ -201,7 +200,11 @@ export default function Category() {
                       </button>
                       <button>
                         <i
-                          onClick={handleDelete.bind(null, c._id)}
+                          onClick={handleDelete.bind(
+                            null,
+                            c._id,
+                            c.banner.public_id
+                          )}
                           className="fa-solid fa-trash text-[#f00] text-[19px]"
                         ></i>
                       </button>

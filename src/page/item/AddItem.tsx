@@ -8,9 +8,12 @@ import { context } from "../../store";
 import handleToast from "../../util/toast";
 import { ItemType } from "./Item";
 import { CategoryType } from "../category/Category";
+import { uploadCloudinary } from "../../util/uploadFile";
+import { UploadCloudinaryType } from "../../model";
 
 const AddItem = ({
   getItem,
+  currPage,
   detailItem,
   setDetailItem,
 }: {
@@ -19,6 +22,7 @@ const AddItem = ({
     type: string | null,
     column: string | null
   ) => Promise<void>;
+  currPage: number | undefined;
   detailItem: ItemType | null;
   setDetailItem: React.Dispatch<React.SetStateAction<ItemType | null>>;
 }) => {
@@ -26,6 +30,7 @@ const AddItem = ({
 
   const [name, setName] = useState("");
   const [author, setAuthor] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [priceInput, setPriceInput] = useState<number | string>("");
   const [description, setDescription] = useState("");
   const [slogan, setSlogan] = useState("");
@@ -34,8 +39,8 @@ const AddItem = ({
   const [selectCategory, setSelectCategory] = useState<string>("");
   const [count, setCount] = useState<number | string>("");
   const [weight, setWeight] = useState<number | string>("");
-  const [pic, setPic] = useState<FileList | null>(null);
-  const [detailPic, setDetailPic] = useState<FileList | null>(null);
+  const [pic, setPic] = useState<UploadCloudinaryType[]>([]);
+  const [detailPic, setDetailPic] = useState<UploadCloudinaryType[]>([]);
 
   useEffect(() => {
     if (detailItem) {
@@ -47,7 +52,7 @@ const AddItem = ({
       setDescription(detailItem.description);
       setCount(detailItem.count);
       setWeight(detailItem.weight);
-      setSelectCategory(detailItem?.categoryId.toString());
+      setSelectCategory(detailItem?.categoryId._id.toString());
     }
   }, [detailItem]);
 
@@ -71,19 +76,45 @@ const AddItem = ({
     getCategory(null);
   }, []);
 
-  const handleUploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = e.target.files;
       if (files) {
-        setPic(files);
+        try {
+          setIsLoading(true);
+          let newArr = [];
+          for (let i = 0; i < files.length; i++) {
+            const res = await uploadCloudinary(files[i]);
+            newArr.push(res);
+          }
+          setPic(newArr);
+          setIsLoading(false);
+        } catch (err) {
+          setIsLoading(false);
+          console.log(err);
+        }
       }
     }
   };
-  const handleDetailUploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDetailUploadFile = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = e.target.files;
       if (files) {
-        setDetailPic(files);
+        try {
+          setIsLoading(true);
+          let newArr = [];
+          for (let i = 0; i < files.length; i++) {
+            const res = await uploadCloudinary(files[i]);
+            newArr.push(res);
+          }
+          setDetailPic(newArr);
+          setIsLoading(false);
+        } catch (err) {
+          setIsLoading(false);
+          console.log(err);
+        }
       }
     }
   };
@@ -94,33 +125,39 @@ const AddItem = ({
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (detailItem) {
-      if (storeValue && storeValue.user) {
-        const formData = new FormData();
-        if (pic) {
-          for (let i = 0; i < pic.length; i++) {
-            formData.append("pic", pic[i]);
-          }
-        }
-        if (detailPic) {
-          for (let i = 0; i < detailPic.length; i++) {
-            formData.append("detailPic", detailPic[i]);
-          }
-        }
-        formData.append("name", name);
-        formData.append("itemId", detailItem._id);
-        formData.append("author", author);
-        formData.append("priceInput", priceInput.toString());
-        formData.append("categoryId", selectCategory);
-        formData.append("slogan", slogan);
-        formData.append("description", description);
-        formData.append("barcode", barcode);
-        formData.append("count", count.toString());
-        formData.append("weight", weight.toString());
+    if (detailItem && currPage) {
+      if (
+        storeValue &&
+        storeValue.user &&
+        name &&
+        description &&
+        priceInput &&
+        count &&
+        barcode &&
+        pic.length &&
+        weight &&
+        author &&
+        selectCategory &&
+        !isLoading
+      ) {
+        const values = {
+          name,
+          description,
+          priceInput,
+          slogan,
+          count,
+          barcode,
+          pic,
+          detailPic,
+          weight,
+          author,
+          itemId: detailItem._id,
+          categoryId: selectCategory,
+        };
 
-        const res = await requests.editItem(formData, storeValue.user.token);
+        const res = await requests.editItem(values, storeValue.user.token);
         if (res.data.message === "ok") {
-          getItem(1, null, null);
+          getItem(currPage, null, null);
           handleToast(toast.success, "Update Product successfully!");
           setDetailItem(null);
           setName("");
@@ -131,8 +168,8 @@ const AddItem = ({
           setCount("");
           setBarcode("");
           setWeight("");
-          setPic(null);
-          setDetailPic(null);
+          setPic([]);
+          setDetailPic([]);
         } else {
           handleToast(toast.error, res.data.message);
         }
@@ -140,31 +177,39 @@ const AddItem = ({
         handleToast(toast.warning, "Not empty fields");
       }
     } else {
-      if (storeValue && storeValue.user) {
-        const formData = new FormData();
-        if (pic) {
-          for (let i = 0; i < pic.length; i++) {
-            formData.append("pic", pic[i]);
-          }
-        }
-        if (detailPic) {
-          for (let i = 0; i < detailPic.length; i++) {
-            formData.append("detailPic", detailPic[i]);
-          }
-        }
-        formData.append("name", name);
-        formData.append("author", author);
-        formData.append("priceInput", priceInput.toString());
-        formData.append("slogan", slogan);
-        formData.append("description", description);
-        formData.append("categoryId", selectCategory);
-        formData.append("barcode", barcode);
-        formData.append("count", count.toString());
-        formData.append("weight", weight.toString());
+      if (
+        storeValue &&
+        storeValue.user &&
+        name &&
+        description &&
+        priceInput &&
+        count &&
+        barcode &&
+        pic.length &&
+        weight &&
+        author &&
+        selectCategory &&
+        !isLoading &&
+        currPage
+      ) {
+        const values = {
+          name,
+          description,
+          detailItem,
+          priceInput,
+          slogan,
+          count,
+          barcode,
+          pic,
+          detailPic,
+          weight,
+          author,
+          categoryId: selectCategory,
+        };
 
-        const res = await requests.createItem(formData, storeValue.user.token);
+        const res = await requests.createItem(values, storeValue.user.token);
         if (res.data.message === "ok") {
-          getItem(1, null, null);
+          getItem(currPage, null, null);
           handleToast(toast.success, "Add Product successfully!");
           setName("");
           setAuthor("");
@@ -174,8 +219,8 @@ const AddItem = ({
           setCount("");
           setBarcode("");
           setWeight("");
-          setPic(null);
-          setDetailPic(null);
+          setPic([]);
+          setDetailPic([]);
         } else {
           handleToast(toast.error, res.data.message);
         }
@@ -185,7 +230,7 @@ const AddItem = ({
     }
   };
 
-  console.log({ detailItem });
+  // console.log({ detailItem, selectCategory });
 
   return (
     <div className="text-[white]">
@@ -332,8 +377,13 @@ const AddItem = ({
         <button
           onClick={handleAdd}
           className="rounded-lg bg-[#383838] py-2 px-4 hover:opacity-80"
+          disabled={isLoading}
         >
-          {detailItem ? "Edit" : "Add"}
+          {isLoading ? (
+            <i className="fa-solid fa-spinner animate-spin"></i>
+          ) : (
+            <span>{detailItem ? "Edit" : "Add"}</span>
+          )}
         </button>
       </form>
     </div>
