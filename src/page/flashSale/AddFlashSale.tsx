@@ -164,7 +164,7 @@ const AddFlashSale = ({
               <label htmlFor="">Date Start</label>
               <DatePicker
                 selected={startDate}
-                minDate={new Date()}
+                minDate={new Date(Date.now() + 1000000)}
                 dateFormat="MMMM d, yyyy h:mm aa"
                 timeFormat="HH:mm"
                 showTimeSelect
@@ -177,7 +177,7 @@ const AddFlashSale = ({
               <label htmlFor="">Date Start</label>
               <DatePicker
                 selected={endDate}
-                minDate={new Date()}
+                minDate={new Date(Date.now() + 1000000)}
                 dateFormat="MMMM d, yyyy h:mm aa"
                 timeFormat="HH:mm"
                 showTimeSelect
