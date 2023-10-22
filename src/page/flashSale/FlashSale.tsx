@@ -88,7 +88,7 @@ export default function FlashSale() {
               <th>Discount Percent</th>
               <th>Start Date</th>
               <th>End Date</th>
-              <th>Active</th>
+              {/* <th>Active</th> */}
               <th>Product</th>
             </tr>
           </thead>
@@ -100,11 +100,11 @@ export default function FlashSale() {
                   const date = new Date(time);
 
                   return `${
-                    date.getHours() + 1 > 10
-                      ? date.getHours() + 1
-                      : date.getHours() + 1 + "0"
+                    date.getHours() >= 10
+                      ? date.getHours()
+                      : date.getHours() + "0"
                   }:${
-                    date.getMinutes() > 10
+                    date.getMinutes() >= 10
                       ? date.getMinutes()
                       : date.getMinutes() + "0"
                   } - ${date.getDate()}/${
@@ -119,13 +119,13 @@ export default function FlashSale() {
                     <td>{v.discount_percent}%</td>
                     <td>{handleShowDate(v.start_date)}</td>
                     <td>{handleShowDate(v.end_date)}</td>
-                    <td className="text-center">
+                    {/* <td className="text-center">
                       {v.end_date > Date.now() ? (
                         <i className="fa-solid fa-circle-check text-[green]"></i>
                       ) : (
                         <i className="fa-solid fa-circle-xmark text-[#ff1e00d0]"></i>
                       )}
-                    </td>
+                    </td> */}
                     <td>
                       {v.items.map((i) => (
                         <ul key={i.itemId._id}>
