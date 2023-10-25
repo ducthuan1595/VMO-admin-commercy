@@ -156,7 +156,7 @@ export default function Item() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-[white] text-[32px] pb-4">Manager Product</h1>
           <span className="text-[white] bg-[#383838] text-center rounded-xl ml-3 h-[40px] px-2 hover:opacity-80 leading-[2.4]">
-            {item?.totalNumber}
+            Sum {item?.totalNumber}
           </span>
         </div>
         <AddItem

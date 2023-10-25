@@ -116,7 +116,7 @@ export default function FlashSale() {
                   <tr key={v._id}>
                     <td>{i + 1}</td>
                     <td>{v.name}</td>
-                    <td>{v.discount_percent}%</td>
+                    <td className="text-center">{v.discount_percent}%</td>
                     <td>{handleShowDate(v.start_date)}</td>
                     <td>{handleShowDate(v.end_date)}</td>
                     {/* <td className="text-center">
