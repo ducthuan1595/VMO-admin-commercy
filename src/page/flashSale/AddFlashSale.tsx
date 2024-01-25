@@ -174,7 +174,7 @@ const AddFlashSale = ({
               />
             </div>
             <div className="flex relative flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Date Start</label>
+              <label htmlFor="">Date End</label>
               <DatePicker
                 selected={endDate}
                 minDate={new Date(Date.now())}

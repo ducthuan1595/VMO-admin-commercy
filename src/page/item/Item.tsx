@@ -25,10 +25,11 @@ export interface ItemType {
   slogan: string;
   barcode: string;
   count: number;
-  weight: number;
+  pages: number;
   flashSaleId: FlashSaleType;
   categoryId: CategoryType;
   detailPic: UploadCloudinaryType[];
+  language: string;
 }
 
 interface ItemStateType {
@@ -248,7 +249,7 @@ export default function Item() {
                     <td>{c.barcode}</td>
                     <td>{c.categoryId.name}</td>
                     <td>{c.count} books</td>
-                    <td>{c.weight} pages</td>
+                    <td>{c.pages} pages</td>
                     <td>{c.flashSaleId ? c.flashSaleId.name : "no"}</td>
 
                     <td className="text-center cursor-pointer w-[5rem]">

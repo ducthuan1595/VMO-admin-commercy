@@ -38,9 +38,10 @@ const AddItem = ({
   const [categories, setCategories] = useState<CategoryType[] | null>(null);
   const [selectCategory, setSelectCategory] = useState<string>("");
   const [count, setCount] = useState<number | string>("");
-  const [weight, setWeight] = useState<number | string>("");
+  const [pages, setPages] = useState<number | string>("");
   const [pic, setPic] = useState<UploadCloudinaryType[]>([]);
   const [detailPic, setDetailPic] = useState<UploadCloudinaryType[]>([]);
+  const [language, setLanguage] = useState<string>('');
 
   useEffect(() => {
     if (detailItem) {
@@ -51,8 +52,9 @@ const AddItem = ({
       setBarcode(detailItem.barcode);
       setDescription(detailItem.description);
       setCount(detailItem.count);
-      setWeight(detailItem.weight);
+      setPages(detailItem.pages);
       setSelectCategory(detailItem?.categoryId._id.toString());
+      setLanguage(detailItem?.language);
     }
   }, [detailItem]);
 
@@ -134,8 +136,7 @@ const AddItem = ({
         priceInput &&
         count &&
         barcode &&
-        pic.length &&
-        weight &&
+        pages &&
         author &&
         selectCategory &&
         !isLoading
@@ -149,10 +150,11 @@ const AddItem = ({
           barcode,
           pic,
           detailPic,
-          weight,
+          pages,
           author,
           itemId: detailItem._id,
           categoryId: selectCategory,
+          language,
         };
 
         const res = await requests.editItem(values, storeValue.user.token);
@@ -167,9 +169,10 @@ const AddItem = ({
           setSlogan("");
           setCount("");
           setBarcode("");
-          setWeight("");
+          setPages("");
           setPic([]);
           setDetailPic([]);
+          setLanguage('');
         } else {
           handleToast(toast.error, res.data.message);
         }
@@ -186,7 +189,7 @@ const AddItem = ({
         count &&
         barcode &&
         pic.length &&
-        weight &&
+        pages &&
         author &&
         selectCategory &&
         !isLoading &&
@@ -202,8 +205,9 @@ const AddItem = ({
           barcode,
           pic,
           detailPic,
-          weight,
+          pages,
           author,
+          language,
           categoryId: selectCategory,
         };
 
@@ -218,9 +222,10 @@ const AddItem = ({
           setSlogan("");
           setCount("");
           setBarcode("");
-          setWeight("");
+          setPages("");
           setPic([]);
           setDetailPic([]);
+          setLanguage('');
         } else {
           handleToast(toast.error, res.data.message);
         }
@@ -241,7 +246,7 @@ const AddItem = ({
         <div>
           <div className="flex justify-between items-center gap-8">
             <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Name Book</label>
+              <label htmlFor="">Name Book (*)</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="text"
@@ -252,7 +257,7 @@ const AddItem = ({
               />
             </div>
             <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Name Author</label>
+              <label htmlFor="">Name Author (*)</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="text"
@@ -265,7 +270,7 @@ const AddItem = ({
           </div>
           <div className="flex justify-between items-center gap-8">
             <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Price</label>
+              <label htmlFor="">Price (*)</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="number"
@@ -277,7 +282,7 @@ const AddItem = ({
             </div>
 
             <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Barcode</label>
+              <label htmlFor="">Barcode (*)</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="text"
@@ -287,10 +292,21 @@ const AddItem = ({
                 value={barcode}
               />
             </div>
+            <div className="flex flex-1 flex-col gap-2 mb-4">
+              <label htmlFor="">Language</label>
+              <input
+                className="p-2 rounded-md text-[#333]"
+                type="text"
+                name="barcode"
+                placeholder="Tiếng Việt"
+                onChange={(e) => setLanguage(e.target.value)}
+                value={language}
+              />
+            </div>
           </div>
           <div className="flex justify-between items-center gap-8">
             <div className="flex flex-1 flex-col gap-2 mb-4">
-              <label htmlFor="">Category</label>
+              <label htmlFor="">Category (*)</label>
               <select
                 className="text-[#333] rounded-md p-2"
                 onChange={selectChange}
@@ -306,7 +322,7 @@ const AddItem = ({
               </select>
             </div>
             <div className="flex relative flex-col gap-2 mb-4">
-              <label htmlFor="">Count</label>
+              <label htmlFor="">Count (*)</label>
               <input
                 className="p-2 rounded-md text-[#333]"
                 type="number"
@@ -323,8 +339,8 @@ const AddItem = ({
                 type="number"
                 name="weight"
                 placeholder="300"
-                onChange={(e) => setWeight(e.target.value)}
-                value={weight}
+                onChange={(e) => setPages(e.target.value)}
+                value={pages}
               />
             </div>
           </div>
@@ -340,7 +356,7 @@ const AddItem = ({
             />
           </div>
           <div className="flex flex-1 flex-col gap-2 mb-4">
-            <label htmlFor="">Description</label>
+            <label htmlFor="">Description (*)</label>
             <textarea
               className="p-2 rounded-md text-[#333]"
               // type="text"
@@ -353,7 +369,7 @@ const AddItem = ({
           </div>
           <div className="flex justify-between items-center gap-8">
             <div className="flex flex-col gap-2 mb-4">
-              <label htmlFor="">Upload Image</label>
+              <label htmlFor="">Upload Image (*)</label>
               <input
                 className="p-2 rounded-md text-[#333] w-[200px]"
                 type="file"
