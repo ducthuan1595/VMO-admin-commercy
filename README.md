@@ -8,12 +8,31 @@
   process
 - Allow admin to manage users, items, flashsales,
   vouchers,...
+- Review and feedback products
+- authentication with google, facebook, email
+
 
 # Link deployment
 
-- server: `https://ecomerce-book-server.vercel.app`
-- client: `https://vmo-react-js-commercy.vercel.app`
+- client: `https://tim-gi-the-book.vercel.app/`
 - admin: `https://ecommercy-book-admin.vercel.app`
+
+# MAIN STRUCTURE PAGE
+
+- client: 
+  + home:
+  + category:
+  + cart:
+  + payment:
+  + ordered:
+  + Account information:
+
+- admin: 
+  + dashboard:
+  + list product:
+  + vouchers:
+  + flash sale:
+
 
 # MAIN TECHNOLOGY
 

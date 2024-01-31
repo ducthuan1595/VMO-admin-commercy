@@ -244,7 +244,7 @@ export default function Home() {
                   <tr key={c._id}>
                     <td className="text-center">{i + 1}</td>
                     <td className="capitalize">{c.userId?.username}</td>
-                    <td className="">{c.userId.email}</td>
+                    <td className="">{c.userId?.email}</td>
                     <td className="">
                       {c.items.map((i) => {
                         return (
