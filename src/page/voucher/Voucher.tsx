@@ -7,7 +7,6 @@ import AddVoucher from "./AddVoucher";
 import { requests } from "../../api";
 import { context } from "../../store";
 import handleToast from "../../util/toast";
-import { URL } from "../../api";
 import { UploadCloudinaryType } from "../../model";
 
 interface Voucher {
@@ -39,11 +38,8 @@ export default function Voucher() {
       // const curPage: number = page || 1;
       const limit = 8;
       const res = await requests.getVoucher(page, limit, value.user.token);
-      console.log(res);
-
-      if (res.data.message === "ok") {
-        setVouchers(res.data.data);
-      }
+      setVouchers(res.data.data);
+     
     }
   };
   useEffect(() => {

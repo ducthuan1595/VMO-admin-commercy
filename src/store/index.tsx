@@ -14,21 +14,11 @@ interface UserSectionContextType {
   setTotalProduct: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const currUser = localStorage.getItem("admin-book");
-
 export const context = createContext<UserSectionContextType | null>(null);
 
 const ProviderContext = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(
-    currUser && JSON.parse(currUser)
-  );
+  const [user, setUser] = useState<User | null>(null);
   const [totalProduct, setTotalProduct] = useState<number | null>(0);
-
-  useEffect(() => {
-    // if (user) {
-    localStorage.setItem("admin-book", JSON.stringify(user));
-    // }
-  }, [user]);
 
   const value: UserSectionContextType = {
     user,

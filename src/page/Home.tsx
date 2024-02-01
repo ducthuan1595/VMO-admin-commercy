@@ -1,10 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MainLayout from "../layout/MainLayout";
 import { context } from "../store";
 import { requests } from "../api";
 import { ItemType } from "./item/Item";
 import ShowSort from "../util/ShowSort";
 import { SortType } from "../util/ShowSort";
+import ChartRevenue from "../components/charts/Chart";
+import { getRevenueMonth, getRevenueYear } from "../actions/orders";
+import { getRecentYear } from "../data/chart";
 
 interface UserType {
   username: string;
@@ -47,6 +50,11 @@ export default function Home() {
     column: "",
   });
 
+  const [type, setType] = useState('month');
+  const [byYear, setByYear] = useState(new Date().getFullYear());
+  const [revenues, setRevenues] = useState({});
+  const [showYear, setShowYear] = useState(false);
+
   const [totalProduct, setTotalProduct] = useState<number>(0);
 
   const getItem = async (
@@ -69,7 +77,6 @@ export default function Home() {
         value.user.token
       );
 
-      console.log(res.data.data);
 
       if (res.data.message === "ok") {
         setTotalProduct(res.data.data.totalNumber);
@@ -118,15 +125,25 @@ export default function Home() {
 
   useEffect(() => {
     fetchOrder(1, null, null);
-  }, [value]);
+  }, [value]); 
 
-  console.log({ orders });
+  // GET REVENUE API
   useEffect(() => {
-    const num = orders?.orders.reduce((a, b) => {
-      return a + b.amount;
-    }, 0);
-    setAmountOrder(num);
-  }, [orders]);
+    const getRevenue = async () => {
+      if (type === "month") {
+        const data = await getRevenueMonth(type, byYear);
+        setAmountOrder(data.totalMount);
+        setRevenues(data.result);
+      } else {
+        const data = await getRevenueYear("year");
+        console.log(data);
+
+        setAmountOrder(data.totalMount);
+        setRevenues(data.result);
+      }
+    };
+    getRevenue();
+  }, [type, byYear]);
 
   useEffect(() => {
     if (sort && sort.type && sort.column) {
@@ -200,6 +217,46 @@ export default function Home() {
         </div>
       </div>
       {/* outcome */}
+      <div className="flex items-center gap-5 mt-5 mb-2">
+        <div className="relative">
+          <button
+            onClick={() => setShowYear(true)}
+            className="text-sm border border-dashed border-neutral-500 bg-black p-y2 w-[80px] rounded-md text-neutral-400"
+          >
+            Monthly
+          </button>
+          {showYear && (
+            <ul className="absolute top-[25px] left-2 right-2 bg-neutral-100 rounded">
+              {getRecentYear().map((y) => (
+                <li
+                  onClick={() => {
+                    setType("month");
+                    setByYear(y);
+                    setShowYear(false);
+                  }}
+                  key={y}
+                  className="text-neutral-500 text-center rounded hover:bg-neutral-200 px-2 py-1 text-sm cursor-pointer"
+                >
+                  {y}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div>
+          <button
+            className="text-sm border border-neutral-800 border-dashed bg-neutral-500 py2 w-[80px] rounded-md text-black"
+            onClick={() => {
+              setType("year")
+              setShowYear(false);
+            }}
+          >
+            Yearly
+          </button>
+        </div>
+      </div>
+
+      <ChartRevenue revenues={revenues} type={type} byYear={byYear} />
 
       {/* list order */}
       <div>

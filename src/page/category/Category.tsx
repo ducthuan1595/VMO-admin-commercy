@@ -6,7 +6,6 @@ import MainLayout from "../../layout/MainLayout";
 import AddCategory from "./AddCategory";
 import { requests } from "../../api";
 import { context } from "../../store";
-import { URL } from "../../api";
 import handleToast from "../../util/toast";
 import ShowSort from "../../util/ShowSort";
 import { SortType } from "../../util/ShowSort";

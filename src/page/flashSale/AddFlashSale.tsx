@@ -89,14 +89,10 @@ const AddFlashSale = ({
     debounceDropDown();
   };
 
-  // const callApi = useCallback(debounce(getItem, 3000), []);
-  // useEffect(() => {
-  // }, [searchItem]);
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (storeValue && storeValue.user) {
-      console.log(arrItem);
 
       const valueInput = {
         name,

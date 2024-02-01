@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 
 import { requests } from "../api";
 import { context } from "../store";
@@ -9,7 +10,6 @@ const Form = () => {
   const location = useLocation();
 
   const value = useContext(context);
-  console.log({ value });
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,8 +41,8 @@ const Form = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="h-full mt-[100px] flex justify-center items-center">
-        <div className="flex justify-center items-center h-[560px] w-[400px] rounded-[15px] bg-gradient-to-r from-primary-color to-orange-500">
+      <div className="h-screen flex justify-center items-center">
+        <div className="flex h-4/6 justify-center items-center w-[400px] rounded-[15px] bg-gradient-to-r from-primary-color to-orange-500">
           <div className="bg-[white] rounded-[15px] w-[360px]">
             {/* <form> */}
             <h2 className="text-center text-2xl font-semibold mt-[42px] mx-0 mb-[26px]">
@@ -101,27 +101,6 @@ const Form = () => {
               ) : (
                 ""
               )}
-            </div>
-            <div className="block text-center">
-              <p>Or login with</p>
-              <div className="flex justify-center mb-[40px]">
-                <div>
-                  <i
-                    className="fab fa-google-plus social-google"
-                    style={{
-                      color: "#e1461f",
-                      fontSize: "32px",
-                      marginRight: "10px",
-                    }}
-                  ></i>
-                </div>
-                <div>
-                  <i
-                    className="fab fa-facebook social-facebook"
-                    style={{ fontSize: "32px", color: "#1741d9" }}
-                  ></i>
-                </div>
-              </div>
             </div>
             {/* </form> */}
           </div>

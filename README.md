@@ -2,12 +2,13 @@
 
 # OVERVIEW
 
-- Create an online buying book
+- Create an buying and pay book online
 - It has client and admin website
 - Help user can order book online and track order
   process
 - Allow admin to manage users, items, flashsales,
   vouchers,...
+- The chart compares income by monthly and yearly
 - Review and feedback products
 - authentication with google, facebook, email
 

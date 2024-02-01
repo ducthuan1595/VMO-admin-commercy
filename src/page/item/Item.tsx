@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useContext } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { AxiosResponse } from "axios";
 
 import MainLayout from "../../layout/MainLayout";
 import AddItem from "./AddItem";
-import { requests } from "../../api";
+import { CustomData, requests } from "../../api";
 import { context } from "../../store";
-import { URL } from "../../api";
 import handleToast from "../../util/toast";
 import { CategoryType } from "../category/Category";
 import { FlashSaleType } from "../flashSale/FlashSale";
 import ShowSort from "../../util/ShowSort";
 import { SortType } from "../../util/ShowSort";
 import { UploadCloudinaryType } from "../../model";
+import { CustomAxiosInstance } from "../../config/instance";
 
 export interface ItemType {
   _id: string;
@@ -59,7 +59,7 @@ export default function Item() {
   ) => {
     if (value && value.user && value.user.token) {
       const limit: number = 10;
-      const res = await requests.getItem(
+      const res: AxiosResponse = await requests.getItem(
         null,
         null,
         null,
@@ -72,12 +72,9 @@ export default function Item() {
         value.user.token
       );
 
-      console.log(res.data.data);
-
-      if (res.data.message === "ok") {
         setItem(res.data.data);
         value.setTotalProduct(res.data.data.totalNumber);
-      }
+    
     }
   };
   useEffect(() => {
@@ -122,7 +119,7 @@ export default function Item() {
         false,
         value.user.token
       );
-
+      
       if (res.data.message === "ok") {
         setDetailItem(res.data.data);
         window.scrollTo(0, 0);
